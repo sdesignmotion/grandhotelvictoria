@@ -407,7 +407,10 @@ function rmDance(id){
   if(ST.dances.length<=1)return;
   ST.dances=ST.dances.filter(d=>d.id!==id);
   ST.transitions=ST.transitions.filter(t=>t.from!==id&&t.to!==id);
-  sel=null;renderSB(null);render()saveState();
+  sel = null;
+renderSB(null);
+render();
+saveState();
 }
 function addTransition(fromId, toId){
   const tid = 't' + nid++;
