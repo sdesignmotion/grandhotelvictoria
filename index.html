@@ -33,6 +33,13 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 .bnum-t{background:var(--g50);color:var(--g600)}
 .no-sel{padding:24px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
 .canvas-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+.canvas-wrap .zoom-controls{
+  transition: right 0.25s ease;
+}
+
+.canvas-wrap.ov-open .zoom-controls{
+  right: 316px; /* 300px panel + margin */
+}
 .cbg{position:absolute;inset:0;background-image:radial-gradient(circle,#c8c2b8 1px,transparent 1px);background-size:24px 24px;opacity:.5;pointer-events:none}
 #canvas{position:absolute;top:0;left:0;width:4000px;height:4000px;transform-origin:0 0}
 .chint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:5px 12px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:50}
@@ -135,7 +142,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 .zoom-controls{position:absolute;bottom:16px;right:16px;z-index:100;display:flex;flex-direction:column;gap:4px}
 .zbtn{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s}
 .zbtn:hover{background:var(--bg)}
-.ov-panel{position:absolute;top:0;right:0;bottom:0;width:300px;background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:200;overflow:hidden}
+.ov-panel{position:absolute;top:0;right:0;bottom:0;min-height: 0;width:300px;background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:200;overflow:hidden}
 .ov-panel.open{display:flex}
 .ov-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .ov-head span{font-size:13px;font-weight:600}
@@ -148,6 +155,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   flex-direction:column;
   gap:12px;
   max-height:100%;
+  min-height: 0;
 }
 .ov-sr{display:flex;gap:8px}
 .ov-s{flex:1;background:var(--bg);border-radius:8px;padding:10px 12px}
@@ -457,6 +465,7 @@ document.getElementById('cwrap').addEventListener('wheel',e=>{e.preventDefault()
 function toggleOv(){
   const p=document.getElementById('ovp');
   p.classList.toggle('open');
+  document.getElementById('cwrap').classList.toggle('ov-open', p.classList.contains('open'));
   if(!p.classList.contains('open'))return;
   const body=document.getElementById('ovb');
   let td=0,tt=0;
