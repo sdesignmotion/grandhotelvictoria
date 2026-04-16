@@ -171,11 +171,6 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   display:block;
 }
 
-.tw:hover .tw-dd,
-.tw-dd:hover{
-  display:block;
-}
-
 .box-dd::before,
 .tw-dd::before{
   content:'';
@@ -318,7 +313,6 @@ const lift = -40 * Math.sin(Math.PI * tpos);
 const mx = cx;
 const my = cy + lift;
 
-wrap.style.cssText = `left:${mx}px;top:${my}px`;
     const wrap=document.createElement('div');
     wrap.className='tw';wrap.style.cssText=`left:${mx}px;top:${my}px`;
     const box=document.createElement('div');
@@ -413,7 +407,7 @@ function rmDance(id){
   if(ST.dances.length<=1)return;
   ST.dances=ST.dances.filter(d=>d.id!==id);
   ST.transitions=ST.transitions.filter(t=>t.from!==id&&t.to!==id);
-  sel=null;renderSB(null);render();
+  sel=null;renderSB(null);render()saveState();
 }
 function addTransition(fromId, toId){
   const tid = 't' + nid++;
@@ -430,6 +424,7 @@ function addTransition(fromId, toId){
   });
   render();
   saveState();
+  if(!toId) return;
 }
 
 function addDance(){
@@ -464,7 +459,6 @@ function startDrag(e,id){
   e.preventDefault();
 }
 document.addEventListener('mousemove', e => {
-  let draggingType = null;
   if (dragging) {
     // 🎭 DRAG DANCE NODE
     const d = ST.dances.find(x => x.id === dragging);
@@ -494,9 +488,10 @@ document.addEventListener('mousemove', e => {
       const dx = B.x - A.x;
       const dy = B.y - A.y;
 
-      const tpos =
-        ((mx - A.x) * dx + (my - A.y) * dy) /
-        (dx * dx + dy * dy);
+      const denom = dx*dx + dy*dy;
+if(denom===0) return;
+
+const tpos = ((mx-A.x)*dx + (my-A.y)*dy)/denom;
 
       t.pos = Math.max(0, Math.min(1, tpos));
 
