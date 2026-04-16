@@ -46,6 +46,13 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   z-index:100;
   overflow:visible;
 }
+.dance-node:hover{
+  z-index:99999;
+}
+.dance-box{
+  position:relative;
+  overflow:visible;
+}
 .dance-node:active{cursor:grabbing}
 .dance-node.dim{opacity:.25}
 .dance-box{background:#e8f0fb;border:2px solid var(--b200);border-radius:var(--r);padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);position:relative;transition:border-color .2s,box-shadow .2s,background .2s}
@@ -364,8 +371,18 @@ function renderSB(id,type){
   }
 }
 
-function ud(id,f,v){const d=ST.dances.find(x=>x.id===id);if(d)d[f]=v;render()}
-function ut(id,f,v){const t=ST.transitions.find(x=>x.id===id);if(t)t[f]=v;render()}
+function ud(id,f,v){
+  const d=ST.dances.find(x=>x.id===id);
+  if(d)d[f]=v;
+  saveState();
+  render();
+}
+function ut(id,f,v){
+  const t=ST.transitions.find(x=>x.id===id);
+  if(t)t[f]=v;
+  saveState();
+  render();
+}
 function rmDance(id){
   if(ST.dances.length<=1)return;
   ST.dances=ST.dances.filter(d=>d.id!==id);
@@ -403,7 +420,11 @@ document.addEventListener('mousemove',e=>{
   }
   if(panning&&ps){px=e.clientX-ps.x;py=e.clientY-ps.y;applyT()}
 });
-document.addEventListener('mouseup',()=>{dragging=null;panning=false});
+document.addEventListener('mouseup',()=>{
+  if(dragging) saveState();
+  dragging=null;
+  panning=false;
+});
 
 document.getElementById('cwrap').addEventListener('click',e=>{
   if(!e.target.closest('.dance-box')&&!e.target.closest('.tb')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
@@ -411,7 +432,16 @@ document.getElementById('cwrap').addEventListener('click',e=>{
   }
 });
 document.getElementById('cwrap').addEventListener('mousedown',e=>{
-  if(e.button===1||(e.button===0&&e.altKey)){panning=true;ps={x:e.clientX-px,y:e.clientY-py};e.preventDefault()}
+  if(
+    !e.target.closest('.dance-node') &&
+    !e.target.closest('.tw') &&
+    !e.target.closest('.box-dd') &&
+    !e.target.closest('.tw-dd')
+  ){
+    panning=true;
+    ps={x:e.clientX-px,y:e.clientY-py};
+    e.preventDefault();
+  }
 });
 
 function applyT(){document.getElementById('canvas').style.transform=`translate(${px}px,${py}px) scale(${sc})`}
@@ -462,6 +492,17 @@ function toggleOv(){
   body.innerHTML=h;
 }
 
+function saveState(){
+  localStorage.setItem('dancePlannerState', JSON.stringify(ST));
+}
+
+function loadState(){
+  const saved = localStorage.getItem('dancePlannerState');
+  if(saved){
+    ST = JSON.parse(saved);
+  }
+}
+loadState();
 render();
 </script>
 </body>
