@@ -560,8 +560,13 @@ function toggleOv(){
   if(!p.classList.contains('open'))return;
   const body=document.getElementById('ovb');
   let td=0,tt=0;
-  ST.dances.forEach(d=>{const v=parseFloat(d.dur);if(!isNaN(v))td+=v});
-  ST.transitions.forEach(t=>{const v=parseFloat(t.dur);if(!isNaN(v))tt+=v});
+  ST.dances.forEach(d=>{
+  td += parseDur(d.dur);
+  });
+
+  ST.transitions.forEach(t=>{
+  tt += parseDur(t.dur);
+  });
   const total=(td+tt).toFixed(1),stage=td.toFixed(1),trans=tt.toFixed(1);
   const dancers=allD(),props=allP();
   let h=`
