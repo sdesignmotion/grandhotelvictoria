@@ -8,7 +8,7 @@
 <style>
 :root{--bg:#f0ede8;--surface:#faf9f7;--b200:#a8c4f0;--b400:#4a82d4;--b600:#1a5fa8;--b800:#0d3a6e;--g50:#e6f5ec;--g200:#8ed4a8;--g400:#2ea860;--g600:#1a6640;--border:#ddd8d0;--text:#1a1a1a;--muted:#6b6560;--amber:#e6a817;--amberbg:#fef7e0;--font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace;--r:10px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;display:flex;flex-direction:column}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:16px;flex-shrink:0}
 header h1{font-size:15px;font-weight:600;letter-spacing:-.02em}
 header h1 span{font-weight:300;color:var(--muted)}
@@ -32,7 +32,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 .bnum{width:20px;height:20px;border-radius:50%;background:#e8f0fb;color:var(--b800);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .bnum-t{background:var(--g50);color:var(--g600)}
 .no-sel{padding:24px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
-.canvas-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+.canvas-wrap{flex:1;overflow:visible;position:relative;background:var(--bg)}
 .canvas-wrap .zoom-controls{
   transition: right 0.25s ease;
 }
@@ -42,7 +42,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 }
 .cbg{position:absolute;inset:0;background-image:radial-gradient(circle,#c8c2b8 1px,transparent 1px);background-size:24px 24px;opacity:.5;pointer-events:none}
 #canvas{
-  position:absolute;
+  position:relative;
   top:0;
   left:0;
   width:4000px;
@@ -67,6 +67,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 .tw{
   z-index:10;
   position:absolute;
+  z-index:5;
 }
   
 .dance-node{
