@@ -326,45 +326,69 @@ function render(){
   canvas.querySelectorAll('.dance-node,.tw').forEach(e=>e.remove());
   while(svg.children.length>1)svg.removeChild(svg.lastChild);
 
-  ST.transitions.forEach(t=>{
-    const A=ST.dances.find(d=>d.id===t.from),B=ST.dances.find(d=>d.id===t.to);
-    if(!A||!B)return;
-    const ax=A.x+BW/2,ay=A.y+BH,bx=B.x+BW/2,by=B.y,cy=(ay+by)/2;
-    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',`M${ax},${ay} C${ax},${cy} ${bx},${cy} ${bx},${by}`);
-    path.setAttribute('fill','none');path.setAttribute('stroke','#4a82d4');path.setAttribute('stroke-width','1.5');
-    path.setAttribute('marker-end','url(#marr)');
-    svg.appendChild(path);
-    const tpos = t.pos ?? 0.5;
+ ST.transitions.forEach(t => {
+  const A = ST.dances.find(d => d.id === t.from);
+  const B = ST.dances.find(d => d.id === t.to);
 
-const cx = ax + (bx - ax) * tpos;
-const cy = ay + (by - ay) * tpos;
+  // safety check (prevents full render crash)
+  if (!A || !B) return;
 
-// simple curve lift so it's not on the line
-const lift = -40 * Math.sin(Math.PI * tpos);
-const mx = cx;
-const my = cy + lift;
-    
-    let draggingType = null;
-    const wrap=document.createElement('div');
-    wrap.className='tw';wrap.style.cssText=`left:${mx}px;top:${my}px`;
-    const box=document.createElement('div');
-    box.className='tb'+(sel===t.id?' sel-t':'');box.dataset.id=t.id;
-    box.innerHTML=`<span>${esc(t.name||'Transition')}</span><span class="tdur">${esc(t.dur)||'—'}</span>`;
-    box.onclick=e=>{e.stopPropagation();selNode(t.id,'trans')};
-    box.onmousedown = (e) => {
-  e.stopPropagation();
-  dragging = t.id;
-  draggingType = 'trans';
-};
-    const dd=document.createElement('div');
-    dd.className='tw-dd';
-    dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
-    wrap.appendChild(box);wrap.appendChild(dd);
-    wrap.addEventListener('mouseenter',()=>dd.style.display='block');
-    wrap.addEventListener('mouseleave',()=>dd.style.display='none');
-    canvas.appendChild(wrap);
-  });
+  const ax = A.x + BW / 2;
+  const ay = A.y + BH;
+  const bx = B.x + BW / 2;
+  const by = B.y;
+
+  const tpos = (typeof t.pos === 'number') ? t.pos : 0.5;
+
+  // cubic curve midpoint
+  const cx = ax + (bx - ax) * tpos;
+  const cy = ay + (by - ay) * tpos;
+
+  const lift = -40 * Math.sin(Math.PI * tpos);
+  const mx = cx;
+  const my = cy + lift;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'tw';
+  wrap.style.left = mx + 'px';
+  wrap.style.top = my + 'px';
+
+  const box = document.createElement('div');
+  box.className = 'tb' + (sel === t.id ? ' sel-t' : '');
+  box.dataset.id = t.id;
+
+  box.innerHTML = `
+    <span>${esc(t.name || 'Transition')}</span>
+    <span class="tdur">${esc(t.dur || '—')}</span>
+  `;
+
+  box.onclick = (e) => {
+    e.stopPropagation();
+    selNode(t.id, 'trans');
+  };
+
+  // SAFE dragging (prevents crashes)
+  box.onmousedown = (e) => {
+    e.stopPropagation();
+    dragging = t.id;
+  };
+
+  const dd = document.createElement('div');
+  dd.className = 'tw-dd';
+
+  const dancers = gd(t.dancers || '');
+  const props = gp(t.props || '');
+
+  dd.innerHTML = ddRows(dancers, props, false);
+
+  wrap.appendChild(box);
+  wrap.appendChild(dd);
+
+  wrap.addEventListener('mouseenter', () => dd.style.display = 'block');
+  wrap.addEventListener('mouseleave', () => dd.style.display = 'none');
+
+  canvas.appendChild(wrap);
+});
 
   ST.dances.forEach((d,i)=>{
     const el=document.createElement('div');
