@@ -238,6 +238,12 @@ let nid=5,sel=null,sc=1,px=0,py=0,panning=false,ps=null,dragging=null,doff={x:0,
 function gd(s){return(s||'').split(',').map(x=>x.trim()).filter(Boolean)}
 function gp(s){return gd(s).filter(p=>p.toLowerCase()!=='none')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+/* NEW */
+function parseDur(str){
+  if(!str.includes(':')) return parseFloat(str)||0;
+  const [m,s]=str.split(':').map(Number);
+  return m+(s/60);
+}
 
 function wid(name){
   const n=name.toLowerCase(),r=[];
@@ -312,7 +318,8 @@ const cy = ay + (by - ay) * tpos;
 const lift = -40 * Math.sin(Math.PI * tpos);
 const mx = cx;
 const my = cy + lift;
-
+    
+    let draggingType = null;
     const wrap=document.createElement('div');
     wrap.className='tw';wrap.style.cssText=`left:${mx}px;top:${my}px`;
     const box=document.createElement('div');
@@ -405,12 +412,15 @@ function ut(id,f,v){
 }
 function rmDance(id){
   if(ST.dances.length<=1)return;
-  ST.dances=ST.dances.filter(d=>d.id!==id);
-  ST.transitions=ST.transitions.filter(t=>t.from!==id&&t.to!==id);
+
+  ST.dances = ST.dances.filter(d=>d.id!==id);
+  ST.transitions = ST.transitions.filter(t=>t.from!==id&&t.to!==id);
+
   sel = null;
-renderSB(null);
-render();
-saveState();
+
+  renderSB(null);
+  render();
+  saveState();
 }
 function addTransition(fromId, toId){
   const tid = 't' + nid++;
@@ -476,9 +486,9 @@ document.addEventListener('mousemove', e => {
     }
 
     // 🔗 DRAG TRANSITION (NEW PART)
-    const t = ST.transitions.find(x => x.id === dragging);
+      const t = ST.transitions.find(x => x.id === dragging);
 
-    if (t) {
+      if (t) {
       const A = ST.dances.find(d => d.id === t.from);
       const B = ST.dances.find(d => d.id === t.to);
       if (!A || !B) return;
@@ -492,9 +502,9 @@ document.addEventListener('mousemove', e => {
       const dy = B.y - A.y;
 
       const denom = dx*dx + dy*dy;
-if(denom===0) return;
+      if(denom===0) return;
 
-const tpos = ((mx-A.x)*dx + (my-A.y)*dy)/denom;
+      const tpos = ((mx-A.x)*dx + (my-A.y)*dy)/denom;
 
       t.pos = Math.max(0, Math.min(1, tpos));
 
@@ -593,10 +603,10 @@ dancers.forEach(n=>{
     <span class="ov-n">${esc(n)}</span>
     <span class="ov-l">${esc(dances.join(', '))}</span>
   </div>`;
-});
+  });
 
-h += `<div class="ov-sh">Props</div>`;
-props.forEach(p=>{
+  h += `<div class="ov-sh">Props</div>`;
+  props.forEach(p=>{
   const dances = ST.dances
     .filter(d => gp(d.props).some(x => x.toLowerCase() === p.toLowerCase()))
     .map(d => d.title);
