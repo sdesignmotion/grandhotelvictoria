@@ -4,421 +4,382 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dance Show Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, -apple-system, sans-serif; background: #f4f7fb; min-height: 100vh; color: #1a3a5c; }
-
-  header { background: #fff; border-bottom: 1px solid #d0dcea; padding: 14px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  header h1 { font-size: 17px; font-weight: 700; color: #1a3a5c; }
-  .toolbar-btns { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-
-  button {
-    font-size: 12px; font-weight: 500; padding: 6px 14px;
-    border-radius: 6px; border: 1px solid #b0c8e8;
-    background: #fff; cursor: pointer; color: #1a3a5c; transition: background 0.15s;
-  }
-  button:hover { background: #e8f0fb; }
-  .btn-add { background: #dce9f5; border-color: #4a82c4; }
-  .btn-add:hover { background: #c4d9ef; }
-  .btn-danger { background: #fde; border-color: #e0a0a0; color: #800; font-size: 11px; padding: 4px 10px; }
-  .btn-danger:hover { background: #fcc; }
-
-  .main { display: flex; gap: 0; height: calc(100vh - 57px); }
-
-  .sidebar {
-    width: 300px; min-width: 260px; background: #fff; border-right: 1px solid #d0dcea;
-    overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
-  }
-  .sidebar-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #6a8fb0; text-transform: uppercase; margin-bottom: 4px; }
-
-  .card {
-    background: #fff; border: 1px solid #d0dcea; border-radius: 8px; padding: 12px 14px;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .card-header { display: flex; align-items: center; gap: 8px; }
-  .card-num { width: 22px; height: 22px; border-radius: 50%; background: #dce9f5; color: #1a5fa8; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .card-title-input { flex: 1; font-size: 13px; font-weight: 600; border: none; background: transparent; outline: none; color: #1a3a5c; }
-  .field-row { display: flex; flex-direction: column; gap: 2px; }
-  .field-label { font-size: 10px; font-weight: 600; color: #6a8fb0; text-transform: uppercase; letter-spacing: 0.05em; }
-  textarea, input[type="text"], input[type="number"] {
-    width: 100%; font-size: 12px; padding: 5px 8px;
-    border: 1px solid #d0dcea; border-radius: 5px;
-    background: #f4f7fb; color: #1a3a5c; resize: none;
-    font-family: inherit; outline: none; transition: border-color 0.15s;
-  }
-  textarea:focus, input:focus { border-color: #4a82c4; background: #fff; }
-
-  .trans-card { background: #f0faf4; border: 1px dashed #7cc494; }
-  .trans-label { font-size: 11px; font-weight: 700; color: #1a6640; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-  .trans-arrow { font-size: 14px; }
-
-  .diagram-area { flex: 1; overflow: auto; padding: 24px; }
-  .canvas { position: relative; width: 760px; min-height: 600px; margin: 0 auto; }
-
-  .node { position: absolute; cursor: pointer; user-select: none; }
-  .box {
-    background: #dce9f5; border: 1.5px solid #4a82c4; border-radius: 8px;
-    padding: 10px 14px; min-width: 130px; text-align: center;
-    font-weight: 600; font-size: 13px; color: #1a3a5c; position: relative;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .box:hover { background: #c4d9ef; border-color: #1a5fa8; }
-  .box.highlighted { background: #fff3cd !important; border-color: #e6a817 !important; box-shadow: 0 0 0 2px #e6a81740; }
-  .box.highlighted-trans { background: #d4edda !important; border-color: #28a745 !important; box-shadow: 0 0 0 2px #28a74540; }
-  .box-title { font-size: 13px; font-weight: 700; color: #1a3a5c; line-height: 1.3; }
-  .box-sub { font-size: 10px; font-weight: 400; color: #3a6090; margin-top: 3px; }
-
-  .trans-node .box { background: #e8f5e9; border-color: #52ab6e; border-style: dashed; min-width: 120px; }
-  .trans-node .box:hover { background: #c8e6c9; }
-
-  .dropdown {
-    position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
-    background: #fff; border: 1px solid #b0c8e8; border-radius: 8px;
-    min-width: 240px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.14);
-    display: none; padding: 6px 0;
-  }
-  .node:hover .dropdown, .node:focus-within .dropdown { display: block; }
-  .dd-section { padding: 5px 12px 2px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: #6a8fb0; text-transform: uppercase; }
-  .dd-item { display: flex; align-items: center; gap: 8px; padding: 5px 12px; cursor: default; font-size: 12px; color: #1a3a5c; transition: background 0.1s; }
-  .dd-item:hover { background: #e8f3fc; }
-  .dd-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dd-dot.dancer { background: #4a82c4; }
-  .dd-dot.prop { background: #e6a817; }
-  .dd-name { flex: 1; font-weight: 500; }
-  .dd-loc { font-size: 10px; color: #6a8fb0; font-style: italic; text-align: right; max-width: 110px; }
-
-  svg.arrows { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-
-  .legend { display: flex; gap: 18px; padding: 10px 0 16px; font-size: 11px; color: #5a7a9a; align-items: center; flex-wrap: wrap; }
-  .leg { display: flex; align-items: center; gap: 5px; }
-  .leg-line { display: inline-block; width: 20px; height: 2px; background: #4a82c4; }
-  .leg-dashed { border-top: 2px dashed #52ab6e; }
-
-  .summary-panel {
-    position: fixed; top: 0; right: 0; width: 320px; height: 100vh;
-    background: #fff; border-left: 1px solid #d0dcea; overflow-y: auto;
-    padding: 16px; z-index: 500; display: none; flex-direction: column; gap: 10px;
-  }
-  .summary-panel.open { display: flex; }
-  .summary-close { align-self: flex-end; }
-  .srow { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid #eef2f8; }
-  .srow:last-child { border-bottom: none; }
-  .srow-name { font-weight: 500; }
-  .srow-loc { font-size: 11px; color: #6a8fb0; text-align: right; max-width: 180px; }
-
-  @media (max-width: 700px) {
-    .main { flex-direction: column; height: auto; }
-    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #d0dcea; }
-    .diagram-area { padding: 12px; }
-    .canvas { width: 100%; min-width: 400px; }
-  }
+:root{--bg:#f0ede8;--surface:#faf9f7;--b200:#a8c4f0;--b400:#4a82d4;--b600:#1a5fa8;--b800:#0d3a6e;--g50:#e6f5ec;--g200:#8ed4a8;--g400:#2ea860;--g600:#1a6640;--border:#ddd8d0;--text:#1a1a1a;--muted:#6b6560;--amber:#e6a817;--amberbg:#fef7e0;--font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace;--r:10px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+header h1{font-size:15px;font-weight:600;letter-spacing:-.02em}
+header h1 span{font-weight:300;color:var(--muted)}
+.hbtns{display:flex;gap:8px;margin-left:auto}
+.btn{font-family:var(--font);font-size:12px;font-weight:500;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg)}
+.btn-primary{background:var(--b800);color:#fff;border-color:var(--b800)}
+.btn-primary:hover{background:var(--b600);border-color:var(--b600)}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:280px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sidebar-body{overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px}
+.field-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.field-row{display:flex;flex-direction:column;gap:2px}
+input[type="text"],textarea{width:100%;font-family:var(--font);font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:none;outline:none;transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--b400);background:#fff}
+.edit-title{font-size:14px;font-weight:600;border:none;background:transparent;outline:none;color:var(--text);width:100%;padding:0}
+.edit-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
+.edit-section.ts{background:#f0faf4;border-color:var(--g200)}
+.sect-head{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.bnum{width:20px;height:20px;border-radius:50%;background:#e8f0fb;color:var(--b800);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bnum-t{background:var(--g50);color:var(--g600)}
+.no-sel{padding:24px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+.canvas-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+.cbg{position:absolute;inset:0;background-image:radial-gradient(circle,#c8c2b8 1px,transparent 1px);background-size:24px 24px;opacity:.5;pointer-events:none}
+#canvas{position:absolute;top:0;left:0;width:4000px;height:4000px;transform-origin:0 0}
+.chint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:5px 12px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:50}
+#svgl{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.dance-node{position:absolute;cursor:grab;user-select:none;width:230px;transition:opacity .2s;z-index:10}
+.dance-node:active{cursor:grabbing}
+.dance-node.dim{opacity:.25}
+.dance-box{background:#e8f0fb;border:2px solid var(--b200);border-radius:var(--r);padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);position:relative;transition:border-color .2s,box-shadow .2s,background .2s}
+.dance-box.sel{border-color:var(--b600);box-shadow:0 0 0 3px rgba(74,130,212,.25),0 4px 16px rgba(0,0,0,.12)}
+.dance-box.glow{border-color:var(--amber)!important;box-shadow:0 0 0 4px rgba(230,168,23,.4),0 0 28px rgba(230,168,23,.28)!important;background:var(--amberbg)!important}
+.dnum{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--b400);margin-bottom:4px}
+.dtitle{font-size:15px;font-weight:600;color:var(--b800);line-height:1.3;margin-bottom:6px}
+.dmeta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.mpill{background:rgba(74,130,212,.12);border-radius:4px;padding:2px 7px;font-family:var(--mono);font-size:10px;color:var(--b600)}
+.dtags{display:flex;flex-wrap:wrap;gap:3px}
+.tag{font-size:10px;padding:2px 7px;border-radius:12px;font-weight:500}
+.tag-d{background:rgba(74,130,212,.15);color:var(--b800)}
+.tag-p{background:rgba(230,168,23,.2);color:#6b4a00}
+.dnotes{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4;border-top:1px solid rgba(74,130,212,.12);padding-top:6px}
+.box-dd{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:8px;min-width:230px;max-width:270px;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.14);padding:6px 0;pointer-events:all}
+.dance-node:hover .box-dd{display:block}
+.ddh{padding:5px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.ddr{display:flex;align-items:flex-start;gap:8px;padding:5px 12px;font-size:12px;color:var(--text);cursor:default;transition:background .1s}
+.ddr:hover{background:var(--bg)}
+.ddot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ddot-b{background:var(--b400)}
+.ddot-a{background:var(--amber)}
+.ddn{flex:1;font-weight:500}
+.ddw{font-size:10px;color:var(--muted);font-style:italic;text-align:right;line-height:1.4}
+.dde{padding:6px 12px;font-size:11px;color:var(--muted);font-style:italic}
+.tw{position:absolute;pointer-events:all;z-index:50;transform:translate(-50%,-50%)}
+.tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:100px;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;user-select:none}
+.tb:hover{border-color:var(--g600)}
+.tb.sel-t{border-color:var(--g600);box-shadow:0 0 0 3px rgba(46,168,96,.25)}
+.tb.glow-t{border-color:var(--amber)!important;box-shadow:0 0 0 4px rgba(230,168,23,.4)!important;background:var(--amberbg)!important}
+.tdur{font-family:var(--mono);font-size:9px;color:var(--muted);font-weight:400}
+.tw-dd{display:none;position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:8px;min-width:230px;max-width:270px;z-index:600;box-shadow:0 4px 20px rgba(0,0,0,.14);padding:6px 0}
+.zoom-controls{position:absolute;bottom:16px;right:16px;z-index:100;display:flex;flex-direction:column;gap:4px}
+.zbtn{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s}
+.zbtn:hover{background:var(--bg)}
+.ov-panel{position:absolute;top:0;right:0;bottom:0;width:300px;background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:200;overflow:hidden}
+.ov-panel.open{display:flex}
+.ov-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ov-head span{font-size:13px;font-weight:600}
+.ov-body{overflow-y:auto;flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.ov-sr{display:flex;gap:8px}
+.ov-s{flex:1;background:var(--bg);border-radius:8px;padding:10px 12px}
+.ov-sv{font-size:22px;font-weight:600;font-family:var(--mono)}
+.ov-sl{font-size:10px;color:var(--muted);margin-top:2px}
+.ov-sh{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ov-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);gap:8px}
+.ov-row:last-child{border-bottom:none}
+.ov-n{font-size:12px;font-weight:500}
+.ov-l{font-size:10px;color:var(--muted);text-align:right;line-height:1.5}
 </style>
 </head>
 <body>
-
 <header>
-  <h1>Dance Show Planner</h1>
-  <div class="toolbar-btns">
-    <button class="btn-add" onclick="addDance()">+ Add Dance</button>
-    <button onclick="toggleSummary()">Dancer Overview</button>
+  <h1>Dance Show <span>Planner</span></h1>
+  <div class="hbtns">
+    <button class="btn btn-primary" onclick="addDance()">+ Add dance</button>
+    <button class="btn" onclick="toggleOv()">Overview</button>
   </div>
 </header>
-
 <div class="main">
-  <div class="sidebar" id="sidebar"></div>
-  <div class="diagram-area">
-    <div class="canvas" id="canvas">
-      <svg class="arrows" id="svg-arrows">
+  <div class="sidebar">
+    <div class="sidebar-head" id="slabel">Edit panel</div>
+    <div class="sidebar-body" id="sbody"><div class="no-sel">Click a dance box or transition label to edit it here.</div></div>
+  </div>
+  <div class="canvas-wrap" id="cwrap">
+    <div class="cbg"></div>
+    <div id="canvas">
+      <svg id="svgl" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M2 1L8 5L2 9" fill="none" stroke="#4a82c4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </marker>
-          <marker id="arr-t" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M2 1L8 5L2 9" fill="none" stroke="#52ab6e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <marker id="marr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 2L8 5L2 8" fill="none" stroke="#4a82d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </marker>
         </defs>
       </svg>
-      <div id="nodes-container"></div>
+    </div>
+    <div class="chint">Drag boxes freely · Hover for dancer/prop info · Click to edit · Scroll or +/− to zoom</div>
+    <div class="zoom-controls">
+      <button class="zbtn" onclick="zoom(1.15)">+</button>
+      <button class="zbtn" onclick="zoom(0.87)">−</button>
+      <button class="zbtn" onclick="resetZoom()" style="font-size:11px" title="Reset">⌂</button>
+    </div>
+    <div class="ov-panel" id="ovp">
+      <div class="ov-head"><span>Overview</span><button class="btn" onclick="toggleOv()">Close</button></div>
+      <div class="ov-body" id="ovb"></div>
     </div>
   </div>
 </div>
-
-<div class="summary-panel" id="summary-panel">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <span style="font-weight:700;font-size:14px;color:#1a3a5c">Dancer & Prop Overview</span>
-    <button class="summary-close" onclick="toggleSummary()">Close</button>
-  </div>
-  <div id="summary-content"></div>
-</div>
-
 <script>
-let STATE = {
+const BW=230,BH=130;
+let ST={
   dances:[
-    {id:'d1',title:'Opening Number',dur:'3:30',dancers:'Anna, Mia, Luca, Sofia',props:'Fans, Scarves',notes:'Full ensemble on stage'},
-    {id:'d2',title:'Solo — Mia',dur:'2:15',dancers:'Mia',props:'None',notes:'Spotlight center stage'},
-    {id:'d3',title:'Duet — Luca & Sofia',dur:'4:00',dancers:'Luca, Sofia',props:'Ribbons',notes:'Blue lighting at 1:30'},
-    {id:'d4',title:'Finale',dur:'5:00',dancers:'Anna, Mia, Luca, Sofia',props:'Flags, Confetti',notes:'Curtain call follows'}
+    {id:'d1',title:'Opening Number',dur:'3:30',dancers:'Anna, Mia, Luca, Sofia',props:'Fans, Scarves',notes:'Full ensemble on stage',x:100,y:60},
+    {id:'d2',title:'Solo — Mia',dur:'2:15',dancers:'Mia',props:'None',notes:'Spotlight center stage',x:100,y:330},
+    {id:'d3',title:'Duet — Luca & Sofia',dur:'4:00',dancers:'Luca, Sofia',props:'Ribbons',notes:'Blue lighting at 1:30',x:100,y:600},
+    {id:'d4',title:'Finale',dur:'5:00',dancers:'Anna, Mia, Luca, Sofia',props:'Flags, Confetti',notes:'Curtain call follows',x:100,y:870},
   ],
   transitions:[
-    {id:'t1',after:'d1',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',dur:'1:00',notes:'Stage right wings'},
-    {id:'t2',after:'d2',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all',dur:'0:45',notes:''},
-    {id:'t3',after:'d3',dancers:'All dancers enter',props:'Add finale flags',dur:'1:30',notes:'Full blackout'}
+    {id:'t1',from:'d1',to:'d2',name:'Interval I',dur:'1:00',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',notes:'Stage right wings'},
+    {id:'t2',from:'d2',to:'d3',name:'Interval II',dur:'0:45',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all props',notes:''},
+    {id:'t3',from:'d3',to:'d4',name:'Finale setup',dur:'1:30',dancers:'All dancers enter',props:'Add finale flags',notes:'Full blackout'},
   ]
 };
-let nextId = 5;
+let nid=5,sel=null,sc=1,px=0,py=0,panning=false,ps=null,dragging=null,doff={x:0,y:0};
 
-function getDancers(str){return str.split(',').map(s=>s.trim()).filter(Boolean)}
-function getProps(str){return str.split(',').map(s=>s.trim()).filter(Boolean).filter(p=>p.toLowerCase()!=='none')}
+function gd(s){return(s||'').split(',').map(x=>x.trim()).filter(Boolean)}
+function gp(s){return gd(s).filter(p=>p.toLowerCase()!=='none')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-function whereIsDancer(name){
-  const locs=[];
-  STATE.dances.forEach(d=>{
-    if(getDancers(d.dancers).map(x=>x.toLowerCase()).includes(name.toLowerCase()))
-      locs.push({type:'dance',id:d.id,label:d.title});
-  });
-  STATE.transitions.forEach(t=>{
-    if((t.dancers||'').toLowerCase().includes(name.toLowerCase()))
-      locs.push({type:'trans',id:t.id,label:'T'+(STATE.dances.findIndex(d=>d.id===t.after)+1)+'→'+(STATE.dances.findIndex(d=>d.id===t.after)+2)});
-  });
-  return locs;
+function wid(name){
+  const n=name.toLowerCase(),r=[];
+  ST.dances.forEach(d=>{if(gd(d.dancers).some(x=>x.toLowerCase()===n))r.push({type:'dance',id:d.id,label:d.title})});
+  ST.transitions.forEach(t=>{if((t.dancers||'').toLowerCase().includes(n))r.push({type:'trans',id:t.id,label:t.name||'Transition'})});
+  return r;
 }
-function whereIsProp(name){
-  const locs=[];
-  STATE.dances.forEach(d=>{
-    if(getProps(d.props).map(x=>x.toLowerCase()).includes(name.toLowerCase()))
-      locs.push({type:'dance',id:d.id,label:d.title});
-  });
-  STATE.transitions.forEach(t=>{
-    if((t.props||'').toLowerCase().includes(name.toLowerCase()))
-      locs.push({type:'trans',id:t.id,label:'T'+(STATE.dances.findIndex(d=>d.id===t.after)+1)+'→'+(STATE.dances.findIndex(d=>d.id===t.after)+2)});
-  });
-  return locs;
+function wip(name){
+  const n=name.toLowerCase(),r=[];
+  ST.dances.forEach(d=>{if(gp(d.props).some(x=>x.toLowerCase()===n))r.push({type:'dance',id:d.id,label:d.title})});
+  ST.transitions.forEach(t=>{if((t.props||'').toLowerCase().includes(n))r.push({type:'trans',id:t.id,label:t.name||'Transition'})});
+  return r;
 }
+function allD(){const s=new Set();ST.dances.forEach(d=>gd(d.dancers).forEach(n=>s.add(n)));return[...s].sort()}
+function allP(){const s=new Set();ST.dances.forEach(d=>gp(d.props).forEach(p=>s.add(p)));return[...s].sort()}
 
-function allDancers(){
-  const s=new Set();
-  STATE.dances.forEach(d=>getDancers(d.dancers).forEach(n=>s.add(n)));
-  return [...s].sort();
+function hld(name,on){
+  const nodes=document.querySelectorAll('.dance-node'),tbs=document.querySelectorAll('.tb');
+  if(!on||!name){nodes.forEach(n=>{n.classList.remove('dim');n.querySelector('.dance-box').classList.remove('glow')});tbs.forEach(t=>t.classList.remove('glow-t'));return}
+  const act=new Set(wid(name).map(l=>l.id));
+  nodes.forEach(n=>{const b=n.querySelector('.dance-box');if(act.has(n.dataset.id)){n.classList.remove('dim');b.classList.add('glow')}else{n.classList.add('dim');b.classList.remove('glow')}});
+  tbs.forEach(t=>{if(act.has(t.dataset.id))t.classList.add('glow-t');else t.classList.remove('glow-t')});
 }
-function allProps(){
-  const s=new Set();
-  STATE.dances.forEach(d=>getProps(d.props).forEach(p=>s.add(p)));
-  return [...s].sort();
+function hlp(name,on){
+  const nodes=document.querySelectorAll('.dance-node'),tbs=document.querySelectorAll('.tb');
+  if(!on||!name){nodes.forEach(n=>{n.classList.remove('dim');n.querySelector('.dance-box').classList.remove('glow')});tbs.forEach(t=>t.classList.remove('glow-t'));return}
+  const act=new Set(wip(name).map(l=>l.id));
+  nodes.forEach(n=>{const b=n.querySelector('.dance-box');if(act.has(n.dataset.id)){n.classList.remove('dim');b.classList.add('glow')}else{n.classList.add('dim');b.classList.remove('glow')}});
+  tbs.forEach(t=>{if(act.has(t.dataset.id))t.classList.add('glow-t');else t.classList.remove('glow-t')});
 }
 
-function highlightFor(name, type){
-  document.querySelectorAll('.box').forEach(el=>el.classList.remove('highlighted','highlighted-trans'));
-  if(!name) return;
-  const locs = type==='dancer'?whereIsDancer(name):whereIsProp(name);
-  locs.forEach(loc=>{
-    const el = document.querySelector(`[data-nodeid="${loc.id}"] .box`);
-    if(el) el.classList.add(loc.type==='dance'?'highlighted':'highlighted-trans');
-  });
-}
-
-function buildDropdown(nodeId, isDance){
-  const dancers = isDance
-    ? getDancers(STATE.dances.find(d=>d.id===nodeId)?.dancers||'')
-    : getDancers(STATE.transitions.find(t=>t.id===nodeId)?.dancers||'');
-  const props = isDance
-    ? getProps(STATE.dances.find(d=>d.id===nodeId)?.props||'')
-    : getProps(STATE.transitions.find(t=>t.id===nodeId)?.props||'');
-  let html = '<div class="dropdown">';
+function ddRows(dancers,props,dl){
+  let h='';
   if(dancers.length){
-    html += '<div class="dd-section">Dancers</div>';
+    h+=`<div class="ddh">${dl?'Dancers':'Dancer movements'}</div>`;
     dancers.forEach(n=>{
-      const locs = whereIsDancer(n).map(l=>l.label).join(', ');
-      html += `<div class="dd-item" onmouseenter="highlightFor('${n.replace(/'/g,"\\'")}','dancer')" onmouseleave="highlightFor(null)"><span class="dd-dot dancer"></span><span class="dd-name">${n}</span><span class="dd-loc">${locs}</span></div>`;
+      const locs=wid(n).map(l=>l.label).join(' · ');
+      h+=`<div class="ddr" onmouseenter="hld('${n.replace(/'/g,"\\'")}',true)" onmouseleave="hld(null,false)"><span class="ddot ddot-b"></span><span class="ddn">${esc(n)}</span><span class="ddw">${esc(locs)}</span></div>`;
     });
   }
   if(props.length){
-    html += '<div class="dd-section" style="margin-top:4px">Props</div>';
+    h+=`<div class="ddh" style="margin-top:4px">Props</div>`;
     props.forEach(p=>{
-      const locs = whereIsProp(p).map(l=>l.label).join(', ');
-      html += `<div class="dd-item" onmouseenter="highlightFor('${p.replace(/'/g,"\\'")}','prop')" onmouseleave="highlightFor(null)"><span class="dd-dot prop"></span><span class="dd-name">${p}</span><span class="dd-loc">${locs}</span></div>`;
+      const locs=wip(p).map(l=>l.label).join(' · ');
+      h+=`<div class="ddr" onmouseenter="hlp('${p.replace(/'/g,"\\'")}',true)" onmouseleave="hlp(null,false)"><span class="ddot ddot-a"></span><span class="ddn">${esc(p)}</span><span class="ddw">${esc(locs)}</span></div>`;
     });
   }
-  if(!dancers.length && !props.length) html += '<div class="dd-item" style="color:#aaa;font-style:italic">Nothing assigned yet</div>';
-  html += '</div>';
-  return html;
+  if(!dancers.length&&!props.length)h+='<div class="dde">Nothing assigned yet</div>';
+  return h;
 }
 
-function getLayout(){
-  const layout=[];
-  const dx=220, dy=160, startX=80, startY=40;
-  STATE.dances.forEach((d,i)=>{
-    layout.push({type:'dance',id:d.id, x:startX, y:startY+i*dy, w:170, h:62});
+function render(){
+  const canvas=document.getElementById('canvas'),svg=document.getElementById('svgl');
+  canvas.querySelectorAll('.dance-node,.tw').forEach(e=>e.remove());
+  while(svg.children.length>1)svg.removeChild(svg.lastChild);
+
+  ST.transitions.forEach(t=>{
+    const A=ST.dances.find(d=>d.id===t.from),B=ST.dances.find(d=>d.id===t.to);
+    if(!A||!B)return;
+    const ax=A.x+BW/2,ay=A.y+BH,bx=B.x+BW/2,by=B.y,cy=(ay+by)/2;
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M${ax},${ay} C${ax},${cy} ${bx},${cy} ${bx},${by}`);
+    path.setAttribute('fill','none');path.setAttribute('stroke','#4a82d4');path.setAttribute('stroke-width','1.5');
+    path.setAttribute('marker-end','url(#marr)');
+    svg.appendChild(path);
+    const mx=(ax+bx)/2,my=(ay+by)/2;
+    const wrap=document.createElement('div');
+    wrap.className='tw';wrap.style.cssText=`left:${mx}px;top:${my}px`;
+    const box=document.createElement('div');
+    box.className='tb'+(sel===t.id?' sel-t':'');box.dataset.id=t.id;
+    box.innerHTML=`<span>${esc(t.name||'Transition')}</span><span class="tdur">${esc(t.dur)||'—'}</span>`;
+    box.onclick=e=>{e.stopPropagation();selNode(t.id,'trans')};
+    const dd=document.createElement('div');
+    dd.className='tw-dd';
+    dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
+    wrap.appendChild(box);wrap.appendChild(dd);
+    wrap.addEventListener('mouseenter',()=>dd.style.display='block');
+    wrap.addEventListener('mouseleave',()=>dd.style.display='none');
+    canvas.appendChild(wrap);
   });
-  STATE.transitions.forEach((t,i)=>{
-    layout.push({type:'trans',id:t.id, x:startX+dx, y:startY+40+i*dy, w:155, h:56});
-  });
-  return layout;
-}
 
-function renderDiagram(){
-  const layout = getLayout();
-  const container = document.getElementById('nodes-container');
-  container.innerHTML='';
-  const maxY = Math.max(...layout.map(n=>n.y+(n.h||60)))+60;
-  document.getElementById('canvas').style.minHeight = maxY+'px';
-
-  layout.forEach(n=>{
-    const div=document.createElement('div');
-    div.className='node '+(n.type==='trans'?'trans-node':'');
-    div.setAttribute('data-nodeid',n.id);
-    div.style.cssText=`left:${n.x}px;top:${n.y}px;width:${n.w}px`;
-    let inner='';
-    if(n.type==='dance'){
-      const d=STATE.dances.find(x=>x.id===n.id);
-      inner=`<div class="box"><div class="box-title">${esc(d.title)}</div><div class="box-sub">${esc(d.dur)} &middot; ${getDancers(d.dancers).length} dancer${getDancers(d.dancers).length!==1?'s':''}</div>${buildDropdown(n.id,true)}</div>`;
-    } else {
-      const t=STATE.transitions.find(x=>x.id===n.id);
-      const ai=STATE.dances.findIndex(d=>d.id===t.after);
-      inner=`<div class="box"><div class="box-title">Transition ${ai+1} &rarr; ${ai+2}</div><div class="box-sub">${esc(t.dur)||'—'}</div>${buildDropdown(n.id,false)}</div>`;
-    }
-    div.innerHTML=inner;
-    container.appendChild(div);
-  });
-  drawArrows(layout);
-}
-
-function getCenter(layout,id){
-  const n=layout.find(x=>x.id===id);
-  if(!n) return null;
-  const h=n.h||60;
-  return{x:n.x+n.w/2, y:n.y+h/2, top:n.y, bot:n.y+h, left:n.x, right:n.x+n.w, mid_y:n.y+h/2};
-}
-
-function drawArrows(layout){
-  const svg=document.getElementById('svg-arrows');
-  while(svg.children.length>1) svg.removeChild(svg.lastChild);
-
-  STATE.dances.forEach((d,i)=>{
-    const a=getCenter(layout,d.id);
-    const t=STATE.transitions.find(tr=>tr.after===d.id);
-    if(t){
-      const b=getCenter(layout,t.id);
-      const line=document.createElementNS('http://www.w3.org/2000/svg','path');
-      line.setAttribute('d',`M${a.right} ${a.mid_y} L${b.left} ${b.mid_y}`);
-      line.setAttribute('stroke','#52ab6e'); line.setAttribute('stroke-width','1.5');
-      line.setAttribute('stroke-dasharray','5 3'); line.setAttribute('fill','none');
-      line.setAttribute('marker-end','url(#arr-t)');
-      svg.appendChild(line);
-    }
-    if(i+1<STATE.dances.length){
-      const b=getCenter(layout,STATE.dances[i+1].id);
-      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',a.x); line.setAttribute('y1',a.bot);
-      line.setAttribute('x2',b.x); line.setAttribute('y2',b.top);
-      line.setAttribute('stroke','#4a82c4'); line.setAttribute('stroke-width','1.5');
-      line.setAttribute('marker-end','url(#arr)');
-      svg.appendChild(line);
-    }
-  });
-  STATE.transitions.forEach(t=>{
-    const a=getCenter(layout,t.id);
-    const dAfterIdx=STATE.dances.findIndex(d=>d.id===t.after);
-    if(dAfterIdx+1<STATE.dances.length){
-      const b=getCenter(layout,STATE.dances[dAfterIdx+1].id);
-      const line=document.createElementNS('http://www.w3.org/2000/svg','path');
-      line.setAttribute('d',`M${a.right} ${a.mid_y} L${b.right+8} ${a.mid_y} L${b.right+8} ${b.mid_y} L${b.right} ${b.mid_y}`);
-      line.setAttribute('stroke','#4a82c4'); line.setAttribute('stroke-width','1.5');
-      line.setAttribute('fill','none'); line.setAttribute('marker-end','url(#arr)');
-      svg.appendChild(line);
-    }
+  ST.dances.forEach((d,i)=>{
+    const el=document.createElement('div');
+    el.className='dance-node';el.dataset.id=d.id;
+    el.style.cssText=`left:${d.x}px;top:${d.y}px;width:${BW}px`;
+    const dtags=gd(d.dancers).map(n=>`<span class="tag tag-d">${esc(n)}</span>`).join('');
+    const ptags=gp(d.props).map(p=>`<span class="tag tag-p">${esc(p)}</span>`).join('');
+    const notes=d.notes?`<div class="dnotes">${esc(d.notes)}</div>`:'';
+    el.innerHTML=`
+      <div class="dance-box${sel===d.id?' sel':''}">
+        <div class="dnum">Dance ${i+1}</div>
+        <div class="dtitle">${esc(d.title)}</div>
+        <div class="dmeta"><span class="mpill">${esc(d.dur)||'—'}</span><span class="mpill">${gd(d.dancers).length} dancer${gd(d.dancers).length!==1?'s':''}</span></div>
+        <div class="dtags">${dtags}${ptags}</div>
+        ${notes}
+        <div class="box-dd">${ddRows(gd(d.dancers),gp(d.props),true)}</div>
+      </div>`;
+    el.querySelector('.dance-box').addEventListener('click',e=>{e.stopPropagation();selNode(d.id,'dance')});
+    el.addEventListener('mousedown',e=>startDrag(e,d.id));
+    canvas.appendChild(el);
   });
 }
 
-function renderSidebar(){
-  const sb=document.getElementById('sidebar');
-  sb.innerHTML='';
-  STATE.dances.forEach((d,i)=>{
-    const t=STATE.transitions.find(tr=>tr.after===d.id);
-    const card=document.createElement('div');
-    card.innerHTML=`
-      <div class="sidebar-title">Dance ${i+1}</div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-num">${i+1}</div>
-          <input class="card-title-input" value="${esc(d.title)}" oninput="upDance('${d.id}','title',this.value)" placeholder="Dance name…">
-          <button class="btn-danger" onclick="removeDance('${d.id}')">✕</button>
-        </div>
-        <div class="field-row"><div class="field-label">Duration (min)</div><input type="text" value="${esc(d.dur)}" oninput="upDance('${d.id}','dur',this.value)" placeholder="e.g. 3:30"></div>
-        <div class="field-row"><div class="field-label">Dancers</div><textarea rows="2" oninput="upDance('${d.id}','dancers',this.value)" placeholder="Comma separated…">${esc(d.dancers)}</textarea></div>
-        <div class="field-row"><div class="field-label">Props</div><textarea rows="2" oninput="upDance('${d.id}','props',this.value)" placeholder="Props used…">${esc(d.props)}</textarea></div>
-        <div class="field-row"><div class="field-label">Notes</div><textarea rows="2" oninput="upDance('${d.id}','notes',this.value)" placeholder="Cues, lighting…">${esc(d.notes)}</textarea></div>
-      </div>
-    `;
-    if(t){
-      const tCard=document.createElement('div');
-      tCard.innerHTML=`
-        <div class="sidebar-title" style="color:#1a6640">Transition ${i+1} → ${i+2}</div>
-        <div class="card trans-card">
-          <div class="trans-label"><span class="trans-arrow">↓</span> After ${esc(d.title)}</div>
-          <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(t.dur)}" oninput="upTrans('${t.id}','dur',this.value)" placeholder="e.g. 1:00"></div>
-          <div class="field-row"><div class="field-label">Dancer movements</div><textarea rows="2" oninput="upTrans('${t.id}','dancers',this.value)" placeholder="Who exits/enters…">${esc(t.dancers)}</textarea></div>
-          <div class="field-row"><div class="field-label">Prop changes</div><textarea rows="2" oninput="upTrans('${t.id}','props',this.value)" placeholder="Add/remove props…">${esc(t.props)}</textarea></div>
-          <div class="field-row"><div class="field-label">Notes</div><input type="text" value="${esc(t.notes)}" oninput="upTrans('${t.id}','notes',this.value)" placeholder="Blackout, cue…"></div>
-        </div>
-      `;
-      card.appendChild(tCard);
-    }
-    sb.appendChild(card);
-  });
+function selNode(id,type){sel=id;renderSB(id,type);render()}
+
+function renderSB(id,type){
+  const lbl=document.getElementById('slabel'),body=document.getElementById('sbody');
+  if(!id){lbl.textContent='Edit panel';body.innerHTML='<div class="no-sel">Click a dance box or transition label to edit it here.</div>';return}
+  if(type==='dance'){
+    const d=ST.dances.find(x=>x.id===id),i=ST.dances.indexOf(d);
+    lbl.textContent=`Dance ${i+1}`;
+    body.innerHTML=`
+      <div class="edit-section">
+        <div class="sect-head"><div class="bnum">${i+1}</div><input class="edit-title" value="${esc(d.title)}" oninput="ud('${id}','title',this.value)"></div>
+        <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(d.dur)}" oninput="ud('${id}','dur',this.value)" placeholder="e.g. 3:30"></div>
+        <div class="field-row"><div class="field-label">Dancers (comma separated)</div><textarea rows="2" oninput="ud('${id}','dancers',this.value)">${esc(d.dancers)}</textarea></div>
+        <div class="field-row"><div class="field-label">Props</div><textarea rows="2" oninput="ud('${id}','props',this.value)">${esc(d.props)}</textarea></div>
+        <div class="field-row"><div class="field-label">Notes / cues</div><textarea rows="2" oninput="ud('${id}','notes',this.value)">${esc(d.notes)}</textarea></div>
+        <button class="btn" style="color:#900;border-color:#e0a0a0;margin-top:4px" onclick="rmDance('${id}')">Remove this dance</button>
+      </div>`;
+  }else{
+    const t=ST.transitions.find(x=>x.id===id);
+    const A=ST.dances.find(d=>d.id===t.from),B=ST.dances.find(d=>d.id===t.to);
+    lbl.textContent='Transition';
+    body.innerHTML=`
+      <div class="edit-section ts">
+        <div class="sect-head"><div class="bnum bnum-t">→</div><input class="edit-title" style="color:#1a6640" value="${esc(t.name)}" oninput="ut('${t.id}','name',this.value)" placeholder="Transition name…"></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:2px">${esc(A?.title||'')} → ${esc(B?.title||'')}</div>
+        <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(t.dur)}" oninput="ut('${t.id}','dur',this.value)" placeholder="e.g. 1:00"></div>
+        <div class="field-row"><div class="field-label">Dancer movements</div><textarea rows="2" oninput="ut('${t.id}','dancers',this.value)">${esc(t.dancers)}</textarea></div>
+        <div class="field-row"><div class="field-label">Prop changes</div><textarea rows="2" oninput="ut('${t.id}','props',this.value)">${esc(t.props)}</textarea></div>
+        <div class="field-row"><div class="field-label">Notes</div><textarea rows="2" oninput="ut('${t.id}','notes',this.value)">${esc(t.notes)}</textarea></div>
+      </div>`;
+  }
 }
 
-function upDance(id,field,val){ const d=STATE.dances.find(x=>x.id===id); if(d){d[field]=val;} renderDiagram(); }
-function upTrans(id,field,val){ const t=STATE.transitions.find(x=>x.id===id); if(t){t[field]=val;} renderDiagram(); }
+function ud(id,f,v){const d=ST.dances.find(x=>x.id===id);if(d)d[f]=v;render()}
+function ut(id,f,v){const t=ST.transitions.find(x=>x.id===id);if(t)t[f]=v;render()}
+function rmDance(id){
+  if(ST.dances.length<=1)return;
+  ST.dances=ST.dances.filter(d=>d.id!==id);
+  ST.transitions=ST.transitions.filter(t=>t.from!==id&&t.to!==id);
+  sel=null;renderSB(null);render();
+}
 
 function addDance(){
-  const newId='d'+nextId++;
-  const newTId='t'+(nextId++);
-  const prev=STATE.dances[STATE.dances.length-1];
-  STATE.dances.push({id:newId,title:'Dance '+(STATE.dances.length+1),dur:'',dancers:'',props:'',notes:''});
-  if(prev) STATE.transitions.push({id:newTId,after:prev.id,dancers:'',props:'',dur:'',notes:''});
-  renderSidebar(); renderDiagram();
+  const newId='d'+nid++,tid='t'+nid++;
+  const last=ST.dances[ST.dances.length-1];
+  const nx=last?last.x:100,ny=last?last.y+BH+160:60;
+  ST.dances.push({id:newId,title:'Dance '+(ST.dances.length+1),dur:'',dancers:'',props:'',notes:'',x:nx,y:ny});
+  if(last)ST.transitions.push({id:tid,from:last.id,to:newId,name:'Transition',dur:'',dancers:'',props:'',notes:''});
+  sel=newId;render();renderSB(newId,'dance');
+  const wrap=document.getElementById('cwrap');
+  setTimeout(()=>wrap.scrollTo({top:Math.max(0,ny*sc-wrap.clientHeight/2),behavior:'smooth'}),50);
 }
 
-function removeDance(id){
-  if(STATE.dances.length<=1) return;
-  STATE.dances=STATE.dances.filter(d=>d.id!==id);
-  STATE.transitions=STATE.transitions.filter(t=>t.after!==id);
-  STATE.transitions=STATE.transitions.filter(t=>STATE.dances.find(d=>d.id===t.after));
-  renderSidebar(); renderDiagram();
+function startDrag(e,id){
+  if(e.button!==0)return;
+  dragging=id;
+  const d=ST.dances.find(x=>x.id===id);
+  const wr=document.getElementById('cwrap').getBoundingClientRect();
+  doff.x=(e.clientX-wr.left-px)/sc-d.x;
+  doff.y=(e.clientY-wr.top-py)/sc-d.y;
+  e.preventDefault();
 }
+document.addEventListener('mousemove',e=>{
+  if(dragging){
+    const d=ST.dances.find(x=>x.id===dragging);if(!d)return;
+    const wr=document.getElementById('cwrap').getBoundingClientRect();
+    d.x=Math.max(0,(e.clientX-wr.left-px)/sc-doff.x);
+    d.y=Math.max(0,(e.clientY-wr.top-py)/sc-doff.y);
+    render();
+  }
+  if(panning&&ps){px=e.clientX-ps.x;py=e.clientY-ps.y;applyT()}
+});
+document.addEventListener('mouseup',()=>{dragging=null;panning=false});
 
-function toggleSummary(){
-  const panel=document.getElementById('summary-panel');
-  panel.classList.toggle('open');
-  if(!panel.classList.contains('open')) return;
-  const cnt=document.getElementById('summary-content');
-  const dancers=allDancers();
-  const props=allProps();
-  let html='<div style="font-weight:600;font-size:12px;color:#1a3a5c;margin-bottom:8px">Dancers</div>';
+document.getElementById('cwrap').addEventListener('click',e=>{
+  if(!e.target.closest('.dance-box')&&!e.target.closest('.tb')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
+    sel=null;renderSB(null);render();
+  }
+});
+document.getElementById('cwrap').addEventListener('mousedown',e=>{
+  if(e.button===1||(e.button===0&&e.altKey)){panning=true;ps={x:e.clientX-px,y:e.clientY-py};e.preventDefault()}
+});
+
+function applyT(){document.getElementById('canvas').style.transform=`translate(${px}px,${py}px) scale(${sc})`}
+function zoom(f){
+  const wrap=document.getElementById('cwrap');
+  const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;
+  px=cx-f*(cx-px);py=cy-f*(cy-py);
+  sc=Math.max(0.2,Math.min(2.5,sc*f));applyT();
+}
+function resetZoom(){sc=1;px=0;py=0;applyT()}
+document.getElementById('cwrap').addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:0.93)},{passive:false});
+
+function toggleOv(){
+  const p=document.getElementById('ovp');
+  p.classList.toggle('open');
+  if(!p.classList.contains('open'))return;
+  const body=document.getElementById('ovb');
+  let td=0,tt=0;
+  ST.dances.forEach(d=>{const v=parseFloat(d.dur);if(!isNaN(v))td+=v});
+  ST.transitions.forEach(t=>{const v=parseFloat(t.dur);if(!isNaN(v))tt+=v});
+  const total=(td+tt).toFixed(1),stage=td.toFixed(1),trans=tt.toFixed(1);
+  const dancers=allD(),props=allP();
+  let h=`
+    <div class="ov-sr">
+      <div class="ov-s"><div class="ov-sv">${total}</div><div class="ov-sl">Total time (min)</div></div>
+      <div class="ov-s"><div class="ov-sv">${ST.dances.length}</div><div class="ov-sl">Dances</div></div>
+    </div>
+    <div class="ov-sr">
+      <div class="ov-s"><div class="ov-sv">${stage}</div><div class="ov-sl">Stage time</div></div>
+      <div class="ov-s"><div class="ov-sv">${trans}</div><div class="ov-sl">Transitions</div></div>
+    </div>
+    <div class="ov-sh">Dance order</div>`;
+  ST.dances.forEach((d,i)=>{
+    h+=`<div class="ov-row"><span class="ov-n">${i+1}. ${esc(d.title)}</span><span class="ov-l">${esc(d.dur)||'—'}</span></div>`;
+    const t=ST.transitions.find(tr=>tr.from===d.id);
+    if(t)h+=`<div class="ov-row" style="padding-left:10px"><span class="ov-n" style="font-size:11px;font-weight:400;color:var(--muted)">↓ ${esc(t.name)}</span><span class="ov-l">${esc(t.dur)||'—'}</span></div>`;
+  });
+  h+=`<div class="ov-sh">Dancers</div>`;
   dancers.forEach(n=>{
-    const locs=whereIsDancer(n).map(l=>l.label).join(', ')||'Not placed';
-    html+=`<div class="srow"><span class="srow-name">${esc(n)}</span><span class="srow-loc">${esc(locs)}</span></div>`;
+    const dances=ST.dances.filter(d=>gd(d.dancers).some(x=>x.toLowerCase()===n.toLowerCase())).map(d=>d.title);
+    h+=`<div class="ov-row"><span class="ov-n">${esc(n)}</span><span class="ov-l">${esc(dances.join(', '))}</span></div>`;
   });
-  html+='<div style="font-weight:600;font-size:12px;color:#1a3a5c;margin:14px 0 8px">Props</div>';
+  h+=`<div class="ov-sh">Props</div>`;
   props.forEach(p=>{
-    const locs=whereIsProp(p).map(l=>l.label).join(', ')||'Not placed';
-    html+=`<div class="srow"><span class="srow-name">${esc(p)}</span><span class="srow-loc">${esc(locs)}</span></div>`;
+    const dances=ST.dances.filter(d=>gp(d.props).some(x=>x.toLowerCase()===p.toLowerCase())).map(d=>d.title);
+    h+=`<div class="ov-row"><span class="ov-n">${esc(p)}</span><span class="ov-l">${esc(dances.join(', '))}</span></div>`;
   });
-  let total=0; STATE.dances.forEach(d=>{const v=parseFloat(d.dur);if(!isNaN(v))total+=v;});
-  let ttrans=0; STATE.transitions.forEach(t=>{const v=parseFloat(t.dur);if(!isNaN(v))ttrans+=v;});
-  html+=`<div style="margin-top:16px;background:#f4f7fb;border-radius:6px;padding:10px 12px;font-size:12px">
-    <div class="srow"><span>Total dances</span><span><b>${STATE.dances.length}</b></span></div>
-    <div class="srow"><span>Stage time</span><span><b>${total.toFixed(1)} min</b></span></div>
-    <div class="srow"><span>Transition time</span><span><b>${ttrans.toFixed(1)} min</b></span></div>
-    <div class="srow"><span>Unique dancers</span><span><b>${dancers.length}</b></span></div>
-  </div>`;
-  cnt.innerHTML=html;
+  body.innerHTML=h;
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-renderSidebar();
-renderDiagram();
+render();
 </script>
 </body>
 </html>
