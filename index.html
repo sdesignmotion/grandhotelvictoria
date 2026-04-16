@@ -41,9 +41,34 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   right: 316px; /* 300px panel + margin */
 }
 .cbg{position:absolute;inset:0;background-image:radial-gradient(circle,#c8c2b8 1px,transparent 1px);background-size:24px 24px;opacity:.5;pointer-events:none}
-#canvas{position:absolute;top:0;left:0;width:4000px;height:4000px;transform-origin:0 0}
+#canvas{
+  position:absolute;
+  top:0;
+  left:0;
+  width:4000px;
+  height:4000px;
+  transform-origin:0 0;
+  overflow:visible;
+}
+  
 .chint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:5px 12px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:50}
-#svgl{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+#svgl{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  overflow:visible;
+  z-index:1;
+}
+
+.dance-node,
+.tw{
+  z-index:10;
+  position:absolute;
+}
+  
 .dance-node{
   position:absolute;
   cursor:grab;
