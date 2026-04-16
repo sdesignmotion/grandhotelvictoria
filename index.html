@@ -142,20 +142,19 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 .zoom-controls{position:absolute;bottom:16px;right:16px;z-index:100;display:flex;flex-direction:column;gap:4px}
 .zbtn{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s}
 .zbtn:hover{background:var(--bg)}
-.ov-panel{position:absolute;top:0;right:0;bottom:0;min-height: 0;width:300px;background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:200;overflow:hidden}
+.ov-panel{position:absolute;top:0;right:0;bottom:0;min-height: 0;width:300px;background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:200;overflow:visible}
 .ov-panel.open{display:flex}
 .ov-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .ov-head span{font-size:13px;font-weight:600}
 .ov-body{
-  overflow-y:auto;
-  overflow-x:hidden;
-  flex:1;
-  padding:14px 16px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  max-height:100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
+  flex: 1 1 auto;
+}
+.ov-panel.open{
+  display:flex;
+  height: 100%;
 }
 .ov-sr{display:flex;gap:8px}
 .ov-s{flex:1;background:var(--bg);border-radius:8px;padding:10px 12px}
@@ -361,6 +360,9 @@ function renderSB(id,type){
         <div class="field-row"><div class="field-label">Dancers (comma separated)</div><textarea rows="2" oninput="ud('${id}','dancers',this.value)">${esc(d.dancers)}</textarea></div>
         <div class="field-row"><div class="field-label">Props</div><textarea rows="2" oninput="ud('${id}','props',this.value)">${esc(d.props)}</textarea></div>
         <div class="field-row"><div class="field-label">Notes / cues</div><textarea rows="2" oninput="ud('${id}','notes',this.value)">${esc(d.notes)}</textarea></div>
+        <button class="btn" style="margin-top:8px" onclick="addTransition('${id}','')">
+  + Add transition
+</button>
         <button class="btn" style="color:#900;border-color:#e0a0a0;margin-top:4px" onclick="rmDance('${id}')">Remove this dance</button>
       </div>`;
   }else{
@@ -397,13 +399,39 @@ function rmDance(id){
   ST.transitions=ST.transitions.filter(t=>t.from!==id&&t.to!==id);
   sel=null;renderSB(null);render();
 }
+function addTransition(fromId, toId){
+  const tid = 't' + nid++;
+  ST.transitions.push({
+    id: tid,
+    from: fromId,
+    to: toId,
+    name: 'New transition',
+    dur: '',
+    dancers: '',
+    props: '',
+    notes: ''
+  });
+  render();
+  saveState();
+}
 
 function addDance(){
   const newId='d'+nid++,tid='t'+nid++;
   const last=ST.dances[ST.dances.length-1];
   const nx=last?last.x:100,ny=last?last.y+BH+160:60;
   ST.dances.push({id:newId,title:'Dance '+(ST.dances.length+1),dur:'',dancers:'',props:'',notes:'',x:nx,y:ny});
-  if(last)ST.transitions.push({id:tid,from:last.id,to:newId,name:'Transition',dur:'',dancers:'',props:'',notes:''});
+  if(last){
+  ST.transitions.push({
+    id:tid,
+    from:last.id,
+    to:newId,
+    name:'Transition',
+    dur:'',
+    dancers:'',
+    props:'',
+    notes:''
+  });
+}
   sel=newId;render();renderSB(newId,'dance');
   const wrap=document.getElementById('cwrap');
   setTimeout(()=>wrap.scrollTo({top:Math.max(0,ny*sc-wrap.clientHeight/2),behavior:'smooth'}),50);
@@ -485,9 +513,18 @@ function toggleOv(){
     <div class="ov-sh">Dance order</div>`;
   ST.dances.forEach((d,i)=>{
     h+=`<div class="ov-row"><span class="ov-n">${i+1}. ${esc(d.title)}</span><span class="ov-l">${esc(d.dur)||'—'}</span></div>`;
-    const t=ST.transitions.find(tr=>tr.from===d.id);
-    if(t)h+=`<div class="ov-row" style="padding-left:10px"><span class="ov-n" style="font-size:11px;font-weight:400;color:var(--muted)">↓ ${esc(t.name)}</span><span class="ov-l">${esc(t.dur)||'—'}</span></div>`;
+    ST.transitions
+  .filter(tr => tr.from === d.id)
+  .forEach(t => {
+    h += `
+      <div class="ov-row" style="padding-left:10px">
+        <span class="ov-n" style="font-size:11px;font-weight:400;color:var(--muted)">
+          ↓ ${esc(t.name)}
+        </span>
+        <span class="ov-l">${esc(t.dur)||'—'}</span>
+      </div>`;
   });
+    
   h+=`<div class="ov-sh">Dancers</div>`;
   dancers.forEach(n=>{
     const dances=ST.dances.filter(d=>gd(d.dancers).some(x=>x.toLowerCase()===n.toLowerCase())).map(d=>d.title);
