@@ -553,16 +553,6 @@ props.forEach(p=>{
     <span class="ov-l">${esc(dances.join(', '))}</span>
   </div>`;
 });
-  h+=`<div class="ov-sh">Dancers</div>`;
-  dancers.forEach(n=>{
-    const dances=ST.dances.filter(d=>gd(d.dancers).some(x=>x.toLowerCase()===n.toLowerCase())).map(d=>d.title);
-    h+=`<div class="ov-row"><span class="ov-n">${esc(n)}</span><span class="ov-l">${esc(dances.join(', '))}</span></div>`;
-  });
-  h+=`<div class="ov-sh">Props</div>`;
-  props.forEach(p=>{
-    const dances=ST.dances.filter(d=>gp(d.props).some(x=>x.toLowerCase()===p.toLowerCase())).map(d=>d.title);
-    h+=`<div class="ov-row"><span class="ov-n">${esc(p)}</span><span class="ov-l">${esc(dances.join(', '))}</span></div>`;
-  });
   body.innerHTML=h;
 }
 
@@ -572,13 +562,13 @@ function saveState(){
 
 function loadState(){
   const saved = localStorage.getItem('dancePlannerState');
-  if(saved){
+  if(!saved) return;
+
+  try {
     ST = JSON.parse(saved);
-
-    const maxD = Math.max(...ST.dances.map(d => parseInt(d.id.replace('d',''))||0));
-    const maxT = Math.max(...ST.transitions.map(t => parseInt(t.id.replace('t',''))||0));
-
-    nid = Math.max(maxD, maxT) + 1;
+  } catch(e) {
+    console.warn("Bad saved state, resetting");
+    localStorage.removeItem('dancePlannerState');
   }
 }
 loadState();
