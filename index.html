@@ -109,11 +109,12 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 .ddw{font-size:10px;color:var(--muted);font-style:italic;text-align:right;line-height:1.4}
 .dde{padding:6px 12px;font-size:11px;color:var(--muted);font-style:italic}
 .tw{
-  position:absolute;
-  pointer-events:all;
-  z-index:500;
-  transform:translate(-50%,-50%);
-  overflow:visible;
+  transform: translate(-50%,-50%) scale(0.95);
+  transition: transform .15s;
+}
+
+.tw:hover{
+  transform: translate(-50%,-50%) scale(1);
 }
 .tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:100px;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;user-select:none}
 .tb:hover{border-color:var(--g600)}
@@ -232,10 +233,10 @@ let ST={
     {id:'d4',title:'Finale',dur:'5:00',dancers:'Anna, Mia, Luca, Sofia',props:'Flags, Confetti',notes:'Curtain call follows',x:100,y:870},
   ],
   transitions:[
-    {id:'t1',from:'d1',to:'d2',name:'Interval I',dur:'1:00',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',notes:'Stage right wings'},
-    {id:'t2',from:'d2',to:'d3',name:'Interval II',dur:'0:45',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all props',notes:''},
-    {id:'t3',from:'d3',to:'d4',name:'Finale setup',dur:'1:30',dancers:'All dancers enter',props:'Add finale flags',notes:'Full blackout'},
-  ]
+  {id:'t1',from:'d1',to:'d2',name:'Interval I',dur:'1:00',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',notes:'Stage right wings',pos:0.5},
+  {id:'t2',from:'d2',to:'d3',name:'Interval II',dur:'0:45',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all props',notes:'',pos:0.5},
+  {id:'t3',from:'d3',to:'d4',name:'Finale setup',dur:'1:30',dancers:'All dancers enter',props:'Add finale flags',notes:'Full blackout',pos:0.5},
+]
 };
 let nid=5,sel=null,sc=1,px=0,py=0,panning=false,ps=null,dragging=null,doff={x:0,y:0};
 
@@ -307,13 +308,28 @@ function render(){
     path.setAttribute('fill','none');path.setAttribute('stroke','#4a82d4');path.setAttribute('stroke-width','1.5');
     path.setAttribute('marker-end','url(#marr)');
     svg.appendChild(path);
-    const mx=(ax+bx)/2,my=(ay+by)/2;
+    const tpos = t.pos ?? 0.5;
+
+const cx = ax + (bx - ax) * tpos;
+const cy = ay + (by - ay) * tpos;
+
+// simple curve lift so it's not on the line
+const lift = -40 * Math.sin(Math.PI * tpos);
+const mx = cx;
+const my = cy + lift;
+
+wrap.style.cssText = `left:${mx}px;top:${my}px`;
     const wrap=document.createElement('div');
     wrap.className='tw';wrap.style.cssText=`left:${mx}px;top:${my}px`;
     const box=document.createElement('div');
     box.className='tb'+(sel===t.id?' sel-t':'');box.dataset.id=t.id;
     box.innerHTML=`<span>${esc(t.name||'Transition')}</span><span class="tdur">${esc(t.dur)||'—'}</span>`;
     box.onclick=e=>{e.stopPropagation();selNode(t.id,'trans')};
+    box.onmousedown = (e) => {
+  e.stopPropagation();
+  dragging = t.id;
+  draggingType = 'trans';
+};
     const dd=document.createElement('div');
     dd.className='tw-dd';
     dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
@@ -409,7 +425,8 @@ function addTransition(fromId, toId){
     dur: '',
     dancers: '',
     props: '',
-    notes: ''
+    notes: '',
+    pos: 0.5
   });
   render();
   saveState();
@@ -446,15 +463,53 @@ function startDrag(e,id){
   doff.y=(e.clientY-wr.top-py)/sc-d.y;
   e.preventDefault();
 }
-document.addEventListener('mousemove',e=>{
-  if(dragging){
-    const d=ST.dances.find(x=>x.id===dragging);if(!d)return;
-    const wr=document.getElementById('cwrap').getBoundingClientRect();
-    d.x=Math.max(0,(e.clientX-wr.left-px)/sc-doff.x);
-    d.y=Math.max(0,(e.clientY-wr.top-py)/sc-doff.y);
-    render();
+document.addEventListener('mousemove', e => {
+  let draggingType = null;
+  if (dragging) {
+    // 🎭 DRAG DANCE NODE
+    const d = ST.dances.find(x => x.id === dragging);
+
+    if (d) {
+      const wr = document.getElementById('cwrap').getBoundingClientRect();
+
+      d.x = Math.max(0, (e.clientX - wr.left - px) / sc - doff.x);
+      d.y = Math.max(0, (e.clientY - wr.top - py) / sc - doff.y);
+
+      render();
+    }
+
+    // 🔗 DRAG TRANSITION (NEW PART)
+    const t = ST.transitions.find(x => x.id === dragging);
+
+    if (t) {
+      const A = ST.dances.find(d => d.id === t.from);
+      const B = ST.dances.find(d => d.id === t.to);
+      if (!A || !B) return;
+
+      const wr = document.getElementById('cwrap').getBoundingClientRect();
+
+      const mx = (e.clientX - wr.left - px) / sc;
+      const my = (e.clientY - wr.top - py) / sc;
+
+      const dx = B.x - A.x;
+      const dy = B.y - A.y;
+
+      const tpos =
+        ((mx - A.x) * dx + (my - A.y) * dy) /
+        (dx * dx + dy * dy);
+
+      t.pos = Math.max(0, Math.min(1, tpos));
+
+      render();
+    }
   }
-  if(panning&&ps){px=e.clientX-ps.x;py=e.clientY-ps.y;applyT()}
+
+  // 🖐 PAN VIEW
+  if (panning && ps) {
+    px = e.clientX - ps.x;
+    py = e.clientY - ps.y;
+    applyT();
+  }
 });
 document.addEventListener('mouseup',()=>{
   if(dragging) saveState();
