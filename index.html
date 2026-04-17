@@ -6,9 +6,18 @@
 <title>Dance Show Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f0ede8;--surface:#faf9f7;--b200:#a8c4f0;--b400:#4a82d4;--b600:#1a5fa8;--b800:#0d3a6e;--g50:#e6f5ec;--g200:#8ed4a8;--g400:#2ea860;--g600:#1a6640;--border:#ddd8d0;--text:#1a1a1a;--muted:#6b6560;--amber:#e6a817;--amberbg:#fef7e0;--font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace;--r:10px}
+:root{
+  --bg:#f0ede8;--surface:#faf9f7;--b200:#a8c4f0;--b400:#4a82d4;--b600:#1a5fa8;--b800:#0d3a6e;
+  --g50:#e6f5ec;--g200:#8ed4a8;--g400:#2ea860;--g600:#1a6640;
+  --border:#ddd8d0;--text:#1a1a1a;--muted:#6b6560;
+  --amber:#e6a817;--amberbg:#fef7e0;
+  --font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace;--r:10px;
+  --sidebar:280px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 14px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:300;position:relative}
 header h1{font-size:14px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
 header h1 span{font-weight:300;color:var(--muted)}
@@ -17,23 +26,53 @@ header h1 span{font-weight:300;color:var(--muted)}
 .btn:hover{background:var(--bg)}
 .btn-primary{background:var(--b800);color:#fff;border-color:var(--b800)}
 .btn-primary:hover,.btn-primary:active{background:var(--b600);border-color:var(--b600)}
+
+/* ── LAYOUT ── */
 .main{display:flex;flex:1;overflow:hidden}
 
-/* ─── CANVAS ─── */
-.canvas-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+/* ── EDIT SIDEBAR (left, fixed width, slides in) ── */
+.edit-sidebar{
+  width:var(--sidebar);
+  flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  /* slide in/out */
+  margin-left:calc(-1 * var(--sidebar));
+  transition:margin-left .22s ease;
+  z-index:200;
+}
+.edit-sidebar.open{margin-left:0}
+.edit-sb-head{
+  padding:12px 14px 12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.edit-sb-title{font-size:13px;font-weight:600;color:var(--muted)}
+.edit-sb-close{
+  width:24px;height:24px;border-radius:50%;border:none;
+  background:#e0ddd8;color:var(--text);font-size:14px;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .15s;flex-shrink:0;touch-action:manipulation;
+}
+.edit-sb-close:hover{background:#ccc}
+.edit-sb-body{overflow-y:auto;flex:1 1 0;padding:12px;-webkit-overflow-scrolling:touch}
+
+/* ── CANVAS ── */
+.canvas-wrap{flex:1;overflow:hidden;position:relative;background:var(--bg);min-width:0}
 .cbg{position:absolute;inset:0;background-image:radial-gradient(circle,#c8c2b8 1px,transparent 1px);background-size:24px 24px;opacity:.5;pointer-events:none}
 #canvas{position:relative;top:0;left:0;width:4000px;height:4000px;transform-origin:0 0;overflow:visible}
 .chint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:5px 12px;border-radius:20px;pointer-events:none;white-space:nowrap;z-index:50}
 #svgl{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1}
 
-/* ─── DANCE NODES ─── */
-.dance-node,.tw{z-index:5;position:absolute}
+/* ── DANCE NODES ── */
 .dance-node{position:absolute;cursor:grab;user-select:none;width:230px;transition:opacity .2s;z-index:100;overflow:visible}
-.dance-node:hover,.dance-node.touched{z-index:99999}
-.dance-box{position:relative;overflow:visible}
+.dance-node:hover,.dance-node.touched{z-index:9999}
 .dance-node:active{cursor:grabbing}
 .dance-node.dim{opacity:.25}
-.dance-box{background:#e8f0fb;border:2px solid var(--b200);border-radius:var(--r);padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);position:relative;transition:border-color .2s,box-shadow .2s,background .2s}
+.dance-box{background:#e8f0fb;border:2px solid var(--b200);border-radius:var(--r);padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);position:relative;overflow:visible;transition:border-color .2s,box-shadow .2s,background .2s}
 .dance-box.sel{border-color:var(--b600);box-shadow:0 0 0 3px rgba(74,130,212,.25),0 4px 16px rgba(0,0,0,.12)}
 .dance-box.glow{border-color:var(--amber)!important;box-shadow:0 0 0 4px rgba(230,168,23,.4),0 0 28px rgba(230,168,23,.28)!important;background:var(--amberbg)!important}
 .dnum{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--b400);margin-bottom:4px}
@@ -46,31 +85,23 @@ header h1 span{font-weight:300;color:var(--muted)}
 .tag-p{background:rgba(230,168,23,.2);color:#6b4a00}
 .dnotes{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4;border-top:1px solid rgba(74,130,212,.12);padding-top:6px}
 
-/* ─── DROPDOWNS ─── */
+/* ── HOVER DROPDOWNS ── */
 .box-dd,.tw-dd{
-  display:none;
-  position:absolute;
-  top:calc(100% + 4px);
-  left:50%;
-  transform:translateX(-50%);
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:8px;
-  min-width:230px;
-  max-width:270px;
-  z-index:9999;
-  box-shadow:0 4px 20px rgba(0,0,0,.14);
-  padding:6px 0;
-  pointer-events:auto;
+  display:none;position:absolute;
+  top:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#fff;border:1px solid var(--border);border-radius:8px;
+  min-width:230px;max-width:270px;z-index:99999;
+  box-shadow:0 4px 20px rgba(0,0,0,.14);padding:6px 0;pointer-events:auto;
 }
 .box-dd::before,.tw-dd::before{content:'';position:absolute;top:-10px;left:0;right:0;height:10px}
+/* show on hover OR when .touched is set */
 .dance-node:hover .box-dd,.box-dd:hover,
 .dance-node.touched .box-dd{display:block}
 .tw:hover .tw-dd,.tw-dd:hover,
 .tw.touched .tw-dd{display:block}
 .ddh{padding:5px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
-.ddr{display:flex;align-items:flex-start;gap:8px;padding:5px 12px;font-size:12px;color:var(--text);cursor:pointer;transition:background .1s}
-.ddr:hover,.ddr:active{background:var(--bg)}
+.ddr{display:flex;align-items:flex-start;gap:8px;padding:6px 12px;font-size:12px;color:var(--text);cursor:pointer;transition:background .1s}
+.ddr:hover{background:var(--bg)}
 .ddot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
 .ddot-b{background:var(--b400)}
 .ddot-a{background:var(--amber)}
@@ -78,110 +109,68 @@ header h1 span{font-weight:300;color:var(--muted)}
 .ddw{font-size:10px;color:var(--muted);font-style:italic;text-align:right;line-height:1.4}
 .dde{padding:6px 12px;font-size:11px;color:var(--muted);font-style:italic}
 
-/* ─── TRANSITION WIDGET ─── */
-.tw{transform:translate(-50%,-50%) scale(0.95);transition:transform .15s}
-.tw:hover,.tw.touched{transform:translate(-50%,-50%) scale(1)}
-.tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:100px;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;user-select:none;touch-action:manipulation}
-.tb:hover{border-color:var(--g600)}
+/* ── TRANSITION WIDGET (fixed at bezier midpoint, not draggable) ── */
+.tw{position:absolute;z-index:50;transform:translate(-50%,-50%);pointer-events:auto}
+.tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;
+  font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;
+  gap:2px;text-align:center;min-width:100px;cursor:pointer;
+  transition:border-color .2s,box-shadow .2s,background .2s,transform .15s;
+  user-select:none;touch-action:manipulation}
+.tb:hover,.tw.touched .tb{border-color:var(--g600);transform:scale(1.05)}
 .tb.sel-t{border-color:var(--g600);box-shadow:0 0 0 3px rgba(46,168,96,.25)}
 .tb.glow-t{border-color:var(--amber)!important;box-shadow:0 0 0 4px rgba(230,168,23,.4)!important;background:var(--amberbg)!important}
 .tdur{font-family:var(--mono);font-size:9px;color:var(--muted);font-weight:400}
 
-/* ─── ZOOM CONTROLS ─── */
+/* ── ZOOM CONTROLS ── */
 .zoom-controls{position:absolute;bottom:16px;right:16px;z-index:100;display:flex;flex-direction:column;gap:4px}
-.zbtn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s;touch-action:manipulation}
+.zbtn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s;touch-action:manipulation;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .zbtn:hover{background:var(--bg)}
 
-/* ─── OVERVIEW PANEL ─── */
+/* ── OVERVIEW PANEL ── */
 .ov-panel{
-  position:fixed;
-  top:52px;right:0;bottom:0;
-  width:min(300px, 100vw);
-  background:var(--surface);
-  border-left:1px solid var(--border);
-  display:none;
-  flex-direction:column;
-  z-index:400;
-  overflow:hidden;
+  position:fixed;top:52px;right:0;bottom:0;
+  width:min(300px,100vw);
+  background:var(--surface);border-left:1px solid var(--border);
+  display:none;flex-direction:column;z-index:400;overflow:hidden;
 }
 .ov-panel.open{display:flex}
 .ov-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ov-head span{font-size:13px;font-weight:600}
-.ov-body{overflow-y:auto;overflow-x:hidden;flex:1 1 0;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.ov-body{overflow-y:auto;overflow-x:hidden;flex:1 1 0;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
 .ov-sr{display:flex;gap:8px}
 .ov-s{flex:1;background:var(--bg);border-radius:8px;padding:10px 12px}
 .ov-sv{font-size:22px;font-weight:600;font-family:var(--mono)}
 .ov-sl{font-size:10px;color:var(--muted);margin-top:2px}
-.ov-sh{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px;margin-bottom:4px}
-.ov-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);gap:8px}
+.ov-sh{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px;margin-bottom:2px}
+.ov-row{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);gap:8px}
 .ov-row:last-child{border-bottom:none}
 .ov-n{font-size:12px;font-weight:500}
 .ov-l{font-size:10px;color:var(--muted);text-align:right;line-height:1.5}
 
-/* ─── EDIT PANEL (floating window) ─── */
-.edit-win{
-  position:fixed;
-  top:72px;
-  left:16px;
-  width:300px;
-  max-height:calc(100vh - 90px);
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  box-shadow:0 8px 40px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.1);
-  display:none;
-  flex-direction:column;
-  z-index:500;
-  overflow:hidden;
-}
-.edit-win.open{display:flex}
-.edit-win-head{
-  padding:12px 14px 12px 16px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;
-  justify-content:space-between;
-  flex-shrink:0;
-  cursor:move;
-  user-select:none;
-  background:var(--surface);
-  border-radius:12px 12px 0 0;
-}
-.edit-win-title{font-size:13px;font-weight:600;color:var(--muted)}
-.edit-win-close{
-  width:24px;height:24px;
-  border-radius:50%;
-  border:none;
-  background:#e0ddd8;
-  color:var(--text);
-  font-size:14px;
-  line-height:1;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s;
-  flex-shrink:0;
-}
-.edit-win-close:hover{background:#ccc}
-.edit-win-body{overflow-y:auto;flex:1 1 0;padding:12px}
-
-/* ─── EDIT FORM ─── */
+/* ── EDIT FORM ── */
 .field-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
-.field-row{display:flex;flex-direction:column;gap:2px;margin-bottom:4px}
+.field-row{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
 input[type="text"],textarea{width:100%;font-family:var(--font);font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:none;outline:none;transition:border-color .15s}
 input:focus,textarea:focus{border-color:var(--b400);background:#fff}
-.edit-title{font-size:14px;font-weight:600;border:none;background:transparent;outline:none;color:var(--text);width:100%;padding:0}
-.edit-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
-.edit-section.ts{background:#f0faf4;border-color:var(--g200)}
-.sect-head{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.bnum{width:20px;height:20px;border-radius:50%;background:#e8f0fb;color:var(--b800);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.edit-title-inp{font-size:14px;font-weight:600;border:none;background:transparent;outline:none;color:var(--text);width:100%;padding:0}
+.edit-section{display:flex;flex-direction:column;gap:6px}
+.edit-section.ts .edit-title-inp{color:#1a6640}
+.sect-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.bnum{width:22px;height:22px;border-radius:50%;background:#e8f0fb;color:var(--b800);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .bnum-t{background:var(--g50);color:var(--g600)}
-.no-sel{padding:24px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+.btn-active{background:var(--b800);color:#fff;border-color:var(--b800)}
+.btn-active:hover{background:var(--b600);border-color:var(--b600)}
+.no-sel{padding:32px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}
 
-/* ─── MOBILE ─── */
-@media(max-width:600px){
+/* ── MOBILE ── */
+@media(max-width:640px){
+  :root{--sidebar:100vw}
   header h1{font-size:13px}
   .chint{display:none}
-  .edit-win{width:calc(100vw - 24px);left:12px;top:64px;max-height:60vh}
   .ov-panel{width:100vw;border-left:none}
+  .edit-sidebar{position:fixed;top:52px;left:0;bottom:0;height:calc(100vh - 52px);margin-left:-100vw}
+  .edit-sidebar.open{margin-left:0}
 }
 </style>
 </head>
@@ -190,10 +179,24 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   <h1>Dance Show <span>Planner</span></h1>
   <div class="hbtns">
     <button class="btn btn-primary" onclick="addDance()">+ Dance</button>
+    <button class="btn" id="editbtn" onclick="toggleEditPanel()" title="Open/close edit panel">&#x270E; Edit</button>
     <button class="btn" onclick="toggleOv()">Overview</button>
   </div>
 </header>
+
 <div class="main">
+  <!-- LEFT SIDEBAR EDIT PANEL -->
+  <div class="edit-sidebar" id="editsb">
+    <div class="edit-sb-head">
+      <span class="edit-sb-title" id="editsb-title">Edit</span>
+      <button class="edit-sb-close" onclick="closeEdit()" title="Close">&#x2715;</button>
+    </div>
+    <div class="edit-sb-body" id="editsb-body">
+      <div class="no-sel">Click a dance box or transition to edit it here.</div>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
   <div class="canvas-wrap" id="cwrap">
     <div class="cbg"></div>
     <div id="canvas">
@@ -202,22 +205,19 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
           <marker id="marr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M2 2L8 5L2 8" fill="none" stroke="#4a82d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </marker>
-          <marker id="marr-glow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M2 2L8 5L2 8" fill="none" stroke="#6ba3e8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </marker>
         </defs>
       </svg>
     </div>
-    <div class="chint">Drag boxes · Hover/tap for info · Click to edit · Pinch/scroll to zoom</div>
+    <div class="chint">Drag boxes &middot; Hover for info &middot; Click to select &middot; Press ✎ Edit to edit &middot; Scroll/pinch to zoom</div>
     <div class="zoom-controls">
       <button class="zbtn" onclick="zoom(1.15)" title="Zoom in">+</button>
-      <button class="zbtn" onclick="zoom(0.87)" title="Zoom out">−</button>
-      <button class="zbtn" onclick="resetZoom()" style="font-size:11px" title="Reset">⌂</button>
+      <button class="zbtn" onclick="zoom(0.87)" title="Zoom out">&minus;</button>
+      <button class="zbtn" onclick="resetZoom()" style="font-size:12px" title="Reset view">&#x2302;</button>
     </div>
   </div>
 </div>
 
-<!-- Overview panel (fixed) -->
+<!-- OVERVIEW PANEL -->
 <div class="ov-panel" id="ovp">
   <div class="ov-head">
     <span>Overview</span>
@@ -226,19 +226,9 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   <div class="ov-body" id="ovb"></div>
 </div>
 
-<!-- Edit window (floating, draggable) -->
-<div class="edit-win" id="editwin">
-  <div class="edit-win-head" id="editwin-head">
-    <span class="edit-win-title" id="editwin-title">Edit panel</span>
-    <button class="edit-win-close" onclick="closeEditWin()" title="Close">✕</button>
-  </div>
-  <div class="edit-win-body" id="editwin-body">
-    <div class="no-sel">Click a dance box or transition to edit.</div>
-  </div>
-</div>
-
 <script>
-const BW=230,BH=130;
+/* ═══ CONSTANTS & STATE ═══ */
+const BW=230, BH=130;
 let ST={
   dances:[
     {id:'d1',title:'Opening Number',dur:'3:30',dancers:'Anna, Mia, Luca, Sofia',props:'Fans, Scarves',notes:'Full ensemble on stage',x:100,y:60},
@@ -247,14 +237,16 @@ let ST={
     {id:'d4',title:'Finale',dur:'5:00',dancers:'Anna, Mia, Luca, Sofia',props:'Flags, Confetti',notes:'Curtain call follows',x:100,y:870},
   ],
   transitions:[
-    {id:'t1',from:'d1',to:'d2',name:'Interval I',dur:'1:00',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',notes:'Stage right wings',pos:0.5},
-    {id:'t2',from:'d2',to:'d3',name:'Interval II',dur:'0:45',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all props',notes:'',pos:0.5},
-    {id:'t3',from:'d3',to:'d4',name:'Finale setup',dur:'1:30',dancers:'All dancers enter',props:'Add finale flags',notes:'Full blackout',pos:0.5},
+    {id:'t1',from:'d1',to:'d2',name:'Interval I',dur:'1:00',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',notes:'Stage right wings'},
+    {id:'t2',from:'d2',to:'d3',name:'Interval II',dur:'0:45',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all props',notes:''},
+    {id:'t3',from:'d3',to:'d4',name:'Finale setup',dur:'1:30',dancers:'All dancers enter',props:'Add finale flags',notes:'Full blackout'},
   ]
 };
-let nid=5,sel=null,sc=1,px=0,py=0,panning=false,ps=null,dragging=null,doff={x:0,y:0};
+let nid=5, sel=null, sc=1, px=0, py=0;
+let panning=false, ps=null;
+let dragging=null, doff={x:0,y:0};
 
-/* ── helpers ── */
+/* ═══ HELPERS ═══ */
 function gd(s){return(s||'').split(',').map(x=>x.trim()).filter(Boolean)}
 function gp(s){return gd(s).filter(p=>p.toLowerCase()!=='none')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -262,55 +254,95 @@ function parseDur(str){if(!str||!str.includes(':'))return parseFloat(str)||0;con
 
 function wid(name){
   const n=name.toLowerCase(),r=[];
-  ST.dances.forEach(d=>{if(gd(d.dancers).some(x=>x.toLowerCase()===n))r.push({type:'dance',id:d.id,label:d.title})});
-  ST.transitions.forEach(t=>{if((t.dancers||'').toLowerCase().includes(n))r.push({type:'trans',id:t.id,label:t.name||'Transition'})});
+  ST.dances.forEach(d=>{if(gd(d.dancers).some(x=>x.toLowerCase()===n))r.push({id:d.id,label:d.title})});
+  ST.transitions.forEach(t=>{if((t.dancers||'').toLowerCase().includes(n))r.push({id:t.id,label:t.name||'Transition'})});
   return r;
 }
 function wip(name){
   const n=name.toLowerCase(),r=[];
-  ST.dances.forEach(d=>{if(gp(d.props).some(x=>x.toLowerCase()===n))r.push({type:'dance',id:d.id,label:d.title})});
-  ST.transitions.forEach(t=>{if((t.props||'').toLowerCase().includes(n))r.push({type:'trans',id:t.id,label:t.name||'Transition'})});
+  ST.dances.forEach(d=>{if(gp(d.props).some(x=>x.toLowerCase()===n))r.push({id:d.id,label:d.title})});
+  ST.transitions.forEach(t=>{if((t.props||'').toLowerCase().includes(n))r.push({id:t.id,label:t.name||'Transition'})});
   return r;
 }
 function allD(){const s=new Set();ST.dances.forEach(d=>gd(d.dancers).forEach(n=>s.add(n)));return[...s].sort()}
 function allP(){const s=new Set();ST.dances.forEach(d=>gp(d.props).forEach(p=>s.add(p)));return[...s].sort()}
 
-function hld(name,on){
-  const nodes=document.querySelectorAll('.dance-node'),tbs=document.querySelectorAll('.tb');
-  if(!on||!name){nodes.forEach(n=>{n.classList.remove('dim');n.querySelector('.dance-box').classList.remove('glow')});tbs.forEach(t=>t.classList.remove('glow-t'));return}
-  const act=new Set(wid(name).map(l=>l.id));
-  nodes.forEach(n=>{const b=n.querySelector('.dance-box');if(act.has(n.dataset.id)){n.classList.remove('dim');b.classList.add('glow')}else{n.classList.add('dim');b.classList.remove('glow')}});
-  tbs.forEach(t=>{if(act.has(t.dataset.id))t.classList.add('glow-t');else t.classList.remove('glow-t')});
-}
-function hlp(name,on){
-  const nodes=document.querySelectorAll('.dance-node'),tbs=document.querySelectorAll('.tb');
-  if(!on||!name){nodes.forEach(n=>{n.classList.remove('dim');n.querySelector('.dance-box').classList.remove('glow')});tbs.forEach(t=>t.classList.remove('glow-t'));return}
-  const act=new Set(wip(name).map(l=>l.id));
-  nodes.forEach(n=>{const b=n.querySelector('.dance-box');if(act.has(n.dataset.id)){n.classList.remove('dim');b.classList.add('glow')}else{n.classList.add('dim');b.classList.remove('glow')}});
-  tbs.forEach(t=>{if(act.has(t.dataset.id))t.classList.add('glow-t');else t.classList.remove('glow-t')});
+/* ═══ HIGHLIGHT
+   Works by querying live DOM elements by data-id,
+   so it always finds the current rendered nodes.
+═══ */
+function clearHL(){
+  document.querySelectorAll('.dance-node').forEach(n=>{
+    n.classList.remove('dim');
+    const b=n.querySelector('.dance-box');
+    if(b)b.classList.remove('glow');
+  });
+  document.querySelectorAll('.tb').forEach(t=>t.classList.remove('glow-t'));
 }
 
+function applyHL(ids){
+  // ids = Set of dance/transition ids that MATCH
+  document.querySelectorAll('.dance-node').forEach(n=>{
+    const b=n.querySelector('.dance-box');
+    if(ids.has(n.dataset.id)){
+      n.classList.remove('dim');
+      if(b)b.classList.add('glow');
+    }else{
+      n.classList.add('dim');
+      if(b)b.classList.remove('glow');
+    }
+  });
+  document.querySelectorAll('.tb').forEach(t=>{
+    if(ids.has(t.dataset.id))t.classList.add('glow-t');
+    else t.classList.remove('glow-t');
+  });
+}
+
+function hld(name, on){
+  if(!on||!name){clearHL();return}
+  closeEdit(); // close edit panel when hovering a name
+  applyHL(new Set(wid(name).map(l=>l.id)));
+}
+function hlp(name, on){
+  if(!on||!name){clearHL();return}
+  closeEdit(); // close edit panel when hovering a prop
+  applyHL(new Set(wip(name).map(l=>l.id)));
+}
+
+let activeHl=null;
+function toggleHld(name,type,e){
+  e.stopPropagation();
+  if(activeHl===name){clearHL();activeHl=null;return}
+  clearHL();activeHl=name;
+  closeEdit();
+  const ids=new Set((type==='d'?wid(name):wip(name)).map(l=>l.id));
+  applyHL(ids);
+}
+
+/* ═══ DROPDOWN ROWS ═══ */
 function ddRows(dancers,props,dl){
   let h='';
   if(dancers.length){
     h+=`<div class="ddh">${dl?'Dancers':'Dancer movements'}</div>`;
     dancers.forEach(n=>{
-      const locs=wid(n).map(l=>l.label).join(' · ');
+      const safe=n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const locs=wid(n).map(l=>l.label).join(' \u00b7 ');
       h+=`<div class="ddr"
-        onmouseenter="hld('${n.replace(/'/g,"\\'")}',true)"
+        onmouseenter="hld('${safe}',true)"
         onmouseleave="hld(null,false)"
-        ontouchstart="toggleHld('${n.replace(/'/g,"\\'")}','d',event)"
+        ontouchstart="toggleHld('${safe}','d',event)"
       ><span class="ddot ddot-b"></span><span class="ddn">${esc(n)}</span><span class="ddw">${esc(locs)}</span></div>`;
     });
   }
   if(props.length){
     h+=`<div class="ddh" style="margin-top:4px">Props</div>`;
     props.forEach(p=>{
-      const locs=wip(p).map(l=>l.label).join(' · ');
+      const safe=p.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const locs=wip(p).map(l=>l.label).join(' \u00b7 ');
       h+=`<div class="ddr"
-        onmouseenter="hlp('${p.replace(/'/g,"\\'")}',true)"
+        onmouseenter="hlp('${safe}',true)"
         onmouseleave="hlp(null,false)"
-        ontouchstart="toggleHld('${p.replace(/'/g,"\\'")}','p',event)"
+        ontouchstart="toggleHld('${safe}','p',event)"
       ><span class="ddot ddot-a"></span><span class="ddn">${esc(p)}</span><span class="ddw">${esc(locs)}</span></div>`;
     });
   }
@@ -318,189 +350,252 @@ function ddRows(dancers,props,dl){
   return h;
 }
 
-/* touch-toggle highlight for mobile names */
-let activeHl=null;
-function toggleHld(name,type,e){
-  e.stopPropagation();
-  if(activeHl===name){
-    hld(null,false);hlp(null,false);activeHl=null;
-  }else{
-    hld(null,false);hlp(null,false);
-    activeHl=name;
-    if(type==='d')hld(name,true);else hlp(name,true);
-  }
+/* ═══ BEZIER: transition box locked at midpoint ═══ */
+function getBezier(A,B){
+  const ax=A.x+BW/2, ay=A.y+BH;
+  const bx=B.x+BW/2, by=B.y;
+  const gap=Math.abs(by-ay);
+  const cp1x=ax, cp1y=ay+gap*0.45;
+  const cp2x=bx, cp2y=by-gap*0.45;
+  // t=0.5: B(0.5)=0.125*P0+0.375*P1+0.375*P2+0.125*P3
+  const mx=0.125*ax+0.375*cp1x+0.375*cp2x+0.125*bx;
+  const my=0.125*ay+0.375*cp1y+0.375*cp2y+0.125*by;
+  return {ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y,mx,my};
 }
 
-/* ── SVG connection lines ── */
-function drawConnections(){
+/* ═══ SVG LINES ═══ */
+function drawLines(){
   const svg=document.getElementById('svgl');
-  // remove old lines (keep defs)
   [...svg.children].forEach(c=>{if(c.tagName!=='defs')c.remove()});
-
   ST.transitions.forEach(t=>{
     const A=ST.dances.find(d=>d.id===t.from);
     const B=ST.dances.find(d=>d.id===t.to);
     if(!A||!B)return;
+    const {ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y}=getBezier(A,B);
+    const pd=`M${ax},${ay} C${cp1x},${cp1y} ${cp2x},${cp2y} ${bx},${by}`;
 
-    const ax=A.x+BW/2, ay=A.y+BH;
-    const bx=B.x+BW/2, by=B.y;
-    const tpos=(typeof t.pos==='number')?t.pos:0.5;
-    const lift=-40*Math.sin(Math.PI*tpos);
-    const mx=ax+(bx-ax)*tpos;
-    const my=ay+(by-ay)*tpos+lift;
-
-    // control points for smooth cubic bezier through midpoint
-    const c1x=ax, c1y=ay+60;
-    const c2x=mx-20, c2y=my-30;
-    const c3x=mx+20, c3y=my+30;
-    const c4x=bx, c4y=by-60;
-
-    // shadow/glow line
+    // glow
     const glow=document.createElementNS('http://www.w3.org/2000/svg','path');
-    glow.setAttribute('d',`M${ax},${ay} C${c1x},${c1y} ${c2x},${c2y} ${mx},${my} C${c3x},${c3y} ${c4x},${c4y} ${bx},${by}`);
-    glow.setAttribute('fill','none');
-    glow.setAttribute('stroke','rgba(74,130,212,0.18)');
-    glow.setAttribute('stroke-width','6');
-    glow.setAttribute('stroke-linecap','round');
-    svg.appendChild(glow);
+    glow.setAttribute('d',pd);glow.setAttribute('fill','none');
+    glow.setAttribute('stroke','rgba(74,130,212,0.13)');glow.setAttribute('stroke-width','9');
+    glow.setAttribute('stroke-linecap','round');svg.appendChild(glow);
 
-    // main line
-    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',`M${ax},${ay} C${c1x},${c1y} ${c2x},${c2y} ${mx},${my} C${c3x},${c3y} ${c4x},${c4y} ${bx},${by}`);
-    path.setAttribute('fill','none');
-    path.setAttribute('stroke','#4a82d4');
-    path.setAttribute('stroke-width','2');
-    path.setAttribute('stroke-dasharray','6 4');
-    path.setAttribute('stroke-linecap','round');
-    path.setAttribute('marker-end','url(#marr)');
-    path.setAttribute('opacity','0.75');
-    svg.appendChild(path);
-
-    // animated dash flow
+    // dashed animated line
+    const line=document.createElementNS('http://www.w3.org/2000/svg','path');
+    line.setAttribute('d',pd);line.setAttribute('fill','none');
+    line.setAttribute('stroke','#4a82d4');line.setAttribute('stroke-width','2');
+    line.setAttribute('stroke-dasharray','6 4');line.setAttribute('stroke-linecap','round');
+    line.setAttribute('marker-end','url(#marr)');line.setAttribute('opacity','0.75');
     const anim=document.createElementNS('http://www.w3.org/2000/svg','animate');
     anim.setAttribute('attributeName','stroke-dashoffset');
     anim.setAttribute('from','0');anim.setAttribute('to','-20');
-    anim.setAttribute('dur','1.2s');anim.setAttribute('repeatCount','indefinite');
-    path.appendChild(anim);
+    anim.setAttribute('dur','1.4s');anim.setAttribute('repeatCount','indefinite');
+    line.appendChild(anim);svg.appendChild(line);
 
-    // dot at start and end
-    [
-      [ax,ay,'#a8c4f0'],
-      [bx,by,'#4a82d4']
-    ].forEach(([cx,cy,col])=>{
+    // dots at endpoints
+    [[ax,ay,'#c5d9f5'],[bx,by,'#4a82d4']].forEach(([cx,cy,col])=>{
       const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx',cx);c.setAttribute('cy',cy);
-      c.setAttribute('r','4');c.setAttribute('fill',col);
-      c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','1.5');
+      c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','4.5');
+      c.setAttribute('fill',col);c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','2');
       svg.appendChild(c);
     });
   });
 }
 
-/* ── RENDER ── */
+/* ═══ RENDER ═══ */
 function render(){
-  const canvas=document.getElementById('canvas'),svg=document.getElementById('svgl');
+  const canvas=document.getElementById('canvas');
   canvas.querySelectorAll('.dance-node,.tw').forEach(e=>e.remove());
-  drawConnections();
+  drawLines();
 
+  /* Transition widgets — positioned at bezier midpoint, NOT draggable */
   ST.transitions.forEach(t=>{
     const A=ST.dances.find(d=>d.id===t.from);
     const B=ST.dances.find(d=>d.id===t.to);
     if(!A||!B)return;
-    const ax=A.x+BW/2,ay=A.y+BH,bx=B.x+BW/2,by=B.y;
-    const tpos=(typeof t.pos==='number')?t.pos:0.5;
-    const lift=-40*Math.sin(Math.PI*tpos);
-    const mx=ax+(bx-ax)*tpos,my=ay+(by-ay)*tpos+lift;
+    const {mx,my}=getBezier(A,B);
 
     const wrap=document.createElement('div');
-    wrap.className='tw';wrap.dataset.id=t.id;
-    wrap.style.left=mx+'px';wrap.style.top=my+'px';
+    wrap.className='tw';
+    wrap.dataset.id=t.id;
+    wrap.style.left=mx+'px';
+    wrap.style.top=my+'px';
 
     const box=document.createElement('div');
     box.className='tb'+(sel===t.id?' sel-t':'');
     box.dataset.id=t.id;
     box.innerHTML=`<span>${esc(t.name||'Transition')}</span><span class="tdur">${esc(t.dur||'—')}</span>`;
     box.onclick=e=>{e.stopPropagation();selNode(t.id,'trans')};
-    box.onmousedown=e=>{e.stopPropagation();dragging=t.id};
 
     const dd=document.createElement('div');
     dd.className='tw-dd';
     dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
 
     wrap.appendChild(box);wrap.appendChild(dd);
+    // hover
     wrap.addEventListener('mouseenter',()=>dd.style.display='block');
     wrap.addEventListener('mouseleave',()=>dd.style.display='none');
-
-    // touch: tap transition label to show dd
+    // touch tap
     wrap.addEventListener('touchstart',e=>{
       e.stopPropagation();
       const already=wrap.classList.contains('touched');
       document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
       if(!already)wrap.classList.add('touched');
+      else{clearHL();activeHl=null;selNode(t.id,'trans')}
     },{passive:true});
 
     canvas.appendChild(wrap);
   });
 
+  /* Dance boxes */
   ST.dances.forEach((d,i)=>{
     const el=document.createElement('div');
     el.className='dance-node';el.dataset.id=d.id;
     el.style.cssText=`left:${d.x}px;top:${d.y}px;width:${BW}px`;
+
     const dtags=gd(d.dancers).map(n=>`<span class="tag tag-d">${esc(n)}</span>`).join('');
     const ptags=gp(d.props).map(p=>`<span class="tag tag-p">${esc(p)}</span>`).join('');
     const notes=d.notes?`<div class="dnotes">${esc(d.notes)}</div>`:'';
+
     el.innerHTML=`
       <div class="dance-box${sel===d.id?' sel':''}">
         <div class="dnum">Dance ${i+1}</div>
         <div class="dtitle">${esc(d.title)}</div>
-        <div class="dmeta"><span class="mpill">${esc(d.dur)||'—'}</span><span class="mpill">${gd(d.dancers).length} dancer${gd(d.dancers).length!==1?'s':''}</span></div>
+        <div class="dmeta">
+          <span class="mpill">${esc(d.dur)||'—'}</span>
+          <span class="mpill">${gd(d.dancers).length} dancer${gd(d.dancers).length!==1?'s':''}</span>
+        </div>
         <div class="dtags">${dtags}${ptags}</div>
         ${notes}
         <div class="box-dd">${ddRows(gd(d.dancers),gp(d.props),true)}</div>
       </div>`;
-    el.querySelector('.dance-box').addEventListener('click',e=>{e.stopPropagation();selNode(d.id,'dance')});
+
+    // desktop: click = edit, drag = move
+    el.querySelector('.dance-box').addEventListener('click',e=>{
+      e.stopPropagation();
+      clearHL();activeHl=null;
+      selNode(d.id,'dance');
+    });
     el.addEventListener('mousedown',e=>startDrag(e,d.id));
 
-    // touch: tap box to show info, second tap = edit
-    let tapTimer=null;
+    /* mobile touch: hold = drag, tap = info, double-tap = edit */
+    let holdTimer=null,isTouchDrag=false,tSX=0,tSY=0,tId=null;
     el.addEventListener('touchstart',e=>{
-      e.stopPropagation();
+      if(e.touches.length!==1)return;
+      const tc=e.touches[0];
+      tId=tc.identifier;tSX=tc.clientX;tSY=tc.clientY;isTouchDrag=false;
+      holdTimer=setTimeout(()=>{
+        isTouchDrag=true;
+        document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
+        const wr=document.getElementById('cwrap').getBoundingClientRect();
+        doff.x=(tSX-wr.left-px)/sc-d.x;
+        doff.y=(tSY-wr.top-py)/sc-d.y;
+        dragging=d.id;
+      },280);
+    },{passive:true});
+    el.addEventListener('touchmove',e=>{
+      const tc=[...e.touches].find(t=>t.identifier===tId);if(!tc)return;
+      const moved=Math.hypot(tc.clientX-tSX,tc.clientY-tSY);
+      if(!isTouchDrag&&moved>8){clearTimeout(holdTimer);holdTimer=null;return}
+      if(isTouchDrag&&dragging===d.id){
+        const wr=document.getElementById('cwrap').getBoundingClientRect();
+        d.x=Math.max(0,(tc.clientX-wr.left-px)/sc-doff.x);
+        d.y=Math.max(0,(tc.clientY-wr.top-py)/sc-doff.y);
+        render();e.preventDefault();
+      }
+    },{passive:false});
+    el.addEventListener('touchend',e=>{
+      clearTimeout(holdTimer);holdTimer=null;
+      if(isTouchDrag&&dragging===d.id){dragging=null;isTouchDrag=false;saveState();return}
+      isTouchDrag=false;dragging=null;
       const already=el.classList.contains('touched');
       document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
-      activeHl=null;hld(null,false);
-      if(!already){
-        el.classList.add('touched');
-      }else{
-        selNode(d.id,'dance');
-      }
+      clearHL();activeHl=null;
+      if(!already)el.classList.add('touched');
+      else selNode(d.id,'dance');
     },{passive:true});
 
     canvas.appendChild(el);
   });
 }
 
-/* ── SELECT / EDIT ── */
-function selNode(id,type){sel=id;renderSB(id,type);render()}
+/* ═══ EDIT SIDEBAR ═══ */
+let editPanelOpen = false;
 
-function openEditWin(){document.getElementById('editwin').classList.add('open')}
-function closeEditWin(){document.getElementById('editwin').classList.remove('open');sel=null;render()}
+function openEdit(){
+  editPanelOpen = true;
+  document.getElementById('editsb').classList.add('open');
+  document.getElementById('editbtn').classList.add('btn-active');
+}
+function closeEdit(){
+  editPanelOpen = false;
+  document.getElementById('editsb').classList.remove('open');
+  document.getElementById('editbtn').classList.remove('btn-active');
+}
 
-function renderSB(id,type){
-  const title=document.getElementById('editwin-title'),body=document.getElementById('editwin-body');
-  if(!id){closeEditWin();return}
-  openEditWin();
+/* Toggle the edit panel on/off from the header button.
+   If a node is already selected, open/close shows/hides it.
+   If nothing is selected and panel opens, show the empty prompt. */
+function toggleEditPanel(){
+  if(editPanelOpen){
+    closeEdit();
+  } else {
+    openEdit();
+    // if something is already selected, show its form
+    if(sel){
+      const d=ST.dances.find(x=>x.id===sel);
+      const t=ST.transitions.find(x=>x.id===sel);
+      if(d) renderEdit(sel,'dance');
+      else if(t) renderEdit(sel,'trans');
+    } else {
+      document.getElementById('editsb-title').textContent='Edit';
+      document.getElementById('editsb-body').innerHTML='<div class="no-sel">Select a dance box or transition on the canvas, then use this panel to edit it.</div>';
+    }
+  }
+}
+
+/* Clicking a box just selects it (highlights border).
+   It does NOT open the edit panel automatically.
+   If the edit panel is already open it updates the form content. */
+function selNode(id,type){
+  clearHL();activeHl=null;
+  sel=id;
+  if(editPanelOpen){
+    renderEdit(id,type);
+  }
+  render();
+}
+
+function renderEdit(id,type){
+  const title=document.getElementById('editsb-title');
+  const body=document.getElementById('editsb-body');
+  if(!id){return}
   if(type==='dance'){
     const d=ST.dances.find(x=>x.id===id),i=ST.dances.indexOf(d);
     title.textContent=`Dance ${i+1}`;
     body.innerHTML=`
       <div class="edit-section">
-        <div class="sect-head"><div class="bnum">${i+1}</div><input class="edit-title" value="${esc(d.title)}" oninput="ud('${id}','title',this.value)"></div>
-        <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(d.dur)}" oninput="ud('${id}','dur',this.value)" placeholder="e.g. 3:30"></div>
-        <div class="field-row"><div class="field-label">Dancers (comma separated)</div><textarea rows="2" oninput="ud('${id}','dancers',this.value)">${esc(d.dancers)}</textarea></div>
-        <div class="field-row"><div class="field-label">Props</div><textarea rows="2" oninput="ud('${id}','props',this.value)">${esc(d.props)}</textarea></div>
-        <div class="field-row"><div class="field-label">Notes / cues</div><textarea rows="2" oninput="ud('${id}','notes',this.value)">${esc(d.notes)}</textarea></div>
-        <button class="btn" style="margin-top:8px" onclick="addTransition('${id}','')">+ Add transition</button>
-        <button class="btn" style="color:#900;border-color:#e0a0a0;margin-top:4px" onclick="rmDance('${id}')">Remove this dance</button>
+        <div class="sect-head">
+          <div class="bnum">${i+1}</div>
+          <input class="edit-title-inp" value="${esc(d.title)}" oninput="ud('${id}','title',this.value)">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Duration</div>
+          <input type="text" value="${esc(d.dur)}" oninput="ud('${id}','dur',this.value)" placeholder="e.g. 3:30">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Dancers (comma separated)</div>
+          <textarea rows="2" oninput="ud('${id}','dancers',this.value)">${esc(d.dancers)}</textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Props</div>
+          <textarea rows="2" oninput="ud('${id}','props',this.value)">${esc(d.props)}</textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Notes / cues</div>
+          <textarea rows="2" oninput="ud('${id}','notes',this.value)">${esc(d.notes)}</textarea>
+        </div>
+        <button class="btn" style="color:#900;border-color:#e0a0a0;margin-top:6px" onclick="rmDance('${id}')">Remove this dance</button>
       </div>`;
   }else{
     const t=ST.transitions.find(x=>x.id===id);
@@ -508,17 +603,32 @@ function renderSB(id,type){
     title.textContent='Transition';
     body.innerHTML=`
       <div class="edit-section ts">
-        <div class="sect-head"><div class="bnum bnum-t">→</div><input class="edit-title" style="color:#1a6640" value="${esc(t.name)}" oninput="ut('${t.id}','name',this.value)" placeholder="Transition name…"></div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:2px">${esc(A?.title||'')} → ${esc(B?.title||'')}</div>
-        <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(t.dur)}" oninput="ut('${t.id}','dur',this.value)" placeholder="e.g. 1:00"></div>
-        <div class="field-row"><div class="field-label">Dancer movements</div><textarea rows="2" oninput="ut('${t.id}','dancers',this.value)">${esc(t.dancers)}</textarea></div>
-        <div class="field-row"><div class="field-label">Prop changes</div><textarea rows="2" oninput="ut('${t.id}','props',this.value)">${esc(t.props)}</textarea></div>
-        <div class="field-row"><div class="field-label">Notes</div><textarea rows="2" oninput="ut('${t.id}','notes',this.value)">${esc(t.notes)}</textarea></div>
+        <div class="sect-head">
+          <div class="bnum bnum-t">&#8594;</div>
+          <input class="edit-title-inp" style="color:#1a6640" value="${esc(t.name)}" oninput="ut('${t.id}','name',this.value)" placeholder="Transition name&hellip;">
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">${esc(A?.title||'')} &rarr; ${esc(B?.title||'')}</div>
+        <div class="field-row">
+          <div class="field-label">Duration</div>
+          <input type="text" value="${esc(t.dur)}" oninput="ut('${t.id}','dur',this.value)" placeholder="e.g. 1:00">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Dancer movements</div>
+          <textarea rows="2" oninput="ut('${t.id}','dancers',this.value)">${esc(t.dancers)}</textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Prop changes</div>
+          <textarea rows="2" oninput="ut('${t.id}','props',this.value)">${esc(t.props)}</textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Notes</div>
+          <textarea rows="2" oninput="ut('${t.id}','notes',this.value)">${esc(t.notes)}</textarea>
+        </div>
       </div>`;
   }
 }
 
-/* ── DRAG DANCE NODE ── */
+/* ═══ DESKTOP DRAG ═══ */
 function startDrag(e,id){
   if(e.button!==0)return;
   dragging=id;
@@ -537,35 +647,29 @@ document.addEventListener('mousemove',e=>{
       d.y=Math.max(0,(e.clientY-wr.top-py)/sc-doff.y);
       render();
     }
-    const t=ST.transitions.find(x=>x.id===dragging);
-    if(t){
-      const A=ST.dances.find(d=>d.id===t.from),B=ST.dances.find(d=>d.id===t.to);
-      if(!A||!B)return;
-      const wr=document.getElementById('cwrap').getBoundingClientRect();
-      const mx=(e.clientX-wr.left-px)/sc,my=(e.clientY-wr.top-py)/sc;
-      const dx=B.x-A.x,dy=B.y-A.y,denom=dx*dx+dy*dy;
-      if(denom===0)return;
-      t.pos=Math.max(0,Math.min(1,((mx-A.x)*dx+(my-A.y)*dy)/denom));
-      render();
-    }
   }
   if(panning&&ps){px=e.clientX-ps.x;py=e.clientY-ps.y;applyT()}
 });
 document.addEventListener('mouseup',()=>{if(dragging)saveState();dragging=null;panning=false});
 
-document.getElementById('cwrap').addEventListener('click',e=>{
-  if(!e.target.closest('.dance-box')&&!e.target.closest('.tb')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')&&!e.target.closest('.edit-win')){
-    sel=null;render();
-    // don't close edit window on canvas click, user uses X button
-  }
-});
+/* canvas pan + deselect */
 document.getElementById('cwrap').addEventListener('mousedown',e=>{
   if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
     panning=true;ps={x:e.clientX-px,y:e.clientY-py};e.preventDefault();
   }
 });
+document.getElementById('cwrap').addEventListener('click',e=>{
+  if(!e.target.closest('.dance-box')&&!e.target.closest('.tb')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
+    sel=null;clearHL();activeHl=null;
+    if(editPanelOpen){
+      document.getElementById('editsb-title').textContent='Edit';
+      document.getElementById('editsb-body').innerHTML='<div class="no-sel">Select a dance box or transition on the canvas, then use this panel to edit it.</div>';
+    }
+    render();
+  }
+});
 
-/* ── ZOOM ── */
+/* ═══ ZOOM ═══ */
 function applyT(){document.getElementById('canvas').style.transform=`translate(${px}px,${py}px) scale(${sc})`}
 function zoom(f){
   const wrap=document.getElementById('cwrap');
@@ -576,37 +680,33 @@ function zoom(f){
 function resetZoom(){sc=1;px=20;py=20;applyT()}
 document.getElementById('cwrap').addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:0.93)},{passive:false});
 
-/* ── PINCH-TO-ZOOM (touch) ── */
+/* ═══ PINCH ZOOM + TOUCH PAN ═══ */
 let lastPinchDist=null,pinchMidX=0,pinchMidY=0;
 document.getElementById('cwrap').addEventListener('touchstart',e=>{
   if(e.touches.length===2){
-    const dx=e.touches[0].clientX-e.touches[1].clientX;
-    const dy=e.touches[0].clientY-e.touches[1].clientY;
-    lastPinchDist=Math.hypot(dx,dy);
-    pinchMidX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-    pinchMidY=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    const t0=e.touches[0],t1=e.touches[1];
+    lastPinchDist=Math.hypot(t0.clientX-t1.clientX,t0.clientY-t1.clientY);
+    pinchMidX=(t0.clientX+t1.clientX)/2;pinchMidY=(t0.clientY+t1.clientY)/2;
     e.preventDefault();
-  }else if(e.touches.length===1&&!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
-    panning=true;
-    ps={x:e.touches[0].clientX-px,y:e.touches[0].clientY-py};
+  }else if(e.touches.length===1){
+    if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
+      panning=true;ps={x:e.touches[0].clientX-px,y:e.touches[0].clientY-py};
+    }
   }
 },{passive:false});
 
 document.getElementById('cwrap').addEventListener('touchmove',e=>{
   if(e.touches.length===2&&lastPinchDist!==null){
-    const dx=e.touches[0].clientX-e.touches[1].clientX;
-    const dy=e.touches[0].clientY-e.touches[1].clientY;
-    const dist=Math.hypot(dx,dy);
+    const t0=e.touches[0],t1=e.touches[1];
+    const dist=Math.hypot(t0.clientX-t1.clientX,t0.clientY-t1.clientY);
     const f=dist/lastPinchDist;
     const wr=document.getElementById('cwrap').getBoundingClientRect();
     const cx=pinchMidX-wr.left,cy=pinchMidY-wr.top;
     px=cx-f*(cx-px);py=cy-f*(cy-py);
     sc=Math.max(0.15,Math.min(3,sc*f));
-    applyT();lastPinchDist=dist;
-    e.preventDefault();
+    applyT();lastPinchDist=dist;e.preventDefault();
   }else if(e.touches.length===1&&panning&&ps){
-    px=e.touches[0].clientX-ps.x;py=e.touches[0].clientY-ps.y;applyT();
-    e.preventDefault();
+    px=e.touches[0].clientX-ps.x;py=e.touches[0].clientY-ps.y;applyT();e.preventDefault();
   }
 },{passive:false});
 
@@ -615,15 +715,15 @@ document.getElementById('cwrap').addEventListener('touchend',e=>{
   if(e.touches.length===0){panning=false;ps=null;}
 },{passive:true});
 
-/* ── TAP outside to clear highlights ── */
+/* tap empty canvas → clear everything */
 document.addEventListener('touchstart',e=>{
   if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
     document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
-    activeHl=null;hld(null,false);
+    clearHL();activeHl=null;
   }
 },{passive:true});
 
-/* ── OVERVIEW ── */
+/* ═══ OVERVIEW ═══ */
 function toggleOv(){
   const p=document.getElementById('ovp');
   const opening=!p.classList.contains('open');
@@ -633,22 +733,21 @@ function toggleOv(){
   let td=0,tt=0;
   ST.dances.forEach(d=>td+=parseDur(d.dur));
   ST.transitions.forEach(t=>tt+=parseDur(t.dur));
-  const total=(td+tt).toFixed(1),stage=td.toFixed(1),trans=tt.toFixed(1);
   const dancers=allD(),props=allP();
   let h=`
     <div class="ov-sr">
-      <div class="ov-s"><div class="ov-sv">${total}</div><div class="ov-sl">Total (min)</div></div>
+      <div class="ov-s"><div class="ov-sv">${(td+tt).toFixed(1)}</div><div class="ov-sl">Total (min)</div></div>
       <div class="ov-s"><div class="ov-sv">${ST.dances.length}</div><div class="ov-sl">Dances</div></div>
     </div>
     <div class="ov-sr">
-      <div class="ov-s"><div class="ov-sv">${stage}</div><div class="ov-sl">Stage time</div></div>
-      <div class="ov-s"><div class="ov-sv">${trans}</div><div class="ov-sl">Transitions</div></div>
+      <div class="ov-s"><div class="ov-sv">${td.toFixed(1)}</div><div class="ov-sl">Stage time</div></div>
+      <div class="ov-s"><div class="ov-sv">${tt.toFixed(1)}</div><div class="ov-sl">Transitions</div></div>
     </div>
     <div class="ov-sh">Dance order</div>`;
   ST.dances.forEach((d,i)=>{
     h+=`<div class="ov-row"><span class="ov-n">${i+1}. ${esc(d.title)}</span><span class="ov-l">${esc(d.dur)||'—'}</span></div>`;
     ST.transitions.filter(tr=>tr.from===d.id).forEach(t=>{
-      h+=`<div class="ov-row" style="padding-left:10px"><span class="ov-n" style="font-size:11px;font-weight:400;color:var(--muted)">↓ ${esc(t.name)}</span><span class="ov-l">${esc(t.dur)||'—'}</span></div>`;
+      h+=`<div class="ov-row" style="padding-left:10px"><span class="ov-n" style="font-size:11px;font-weight:400;color:var(--muted)">&darr; ${esc(t.name)}</span><span class="ov-l">${esc(t.dur)||'—'}</span></div>`;
     });
   });
   h+=`<div class="ov-sh">Dancers</div>`;
@@ -664,7 +763,7 @@ function toggleOv(){
   body.innerHTML=h;
 }
 
-/* ── DATA MUTATIONS ── */
+/* ═══ DATA ═══ */
 function ud(id,f,v){const d=ST.dances.find(x=>x.id===id);if(d)d[f]=v;saveState();render()}
 function ut(id,f,v){const t=ST.transitions.find(x=>x.id===id);if(t)t[f]=v;saveState();render()}
 
@@ -672,13 +771,12 @@ function rmDance(id){
   if(ST.dances.length<=1)return;
   ST.dances=ST.dances.filter(d=>d.id!==id);
   ST.transitions=ST.transitions.filter(t=>t.from!==id&&t.to!==id);
-  sel=null;closeEditWin();render();saveState();
-}
-
-function addTransition(fromId,toId){
-  const tid='t'+nid++;
-  ST.transitions.push({id:tid,from:fromId,to:toId,name:'New transition',dur:'',dancers:'',props:'',notes:'',pos:0.5});
-  render();saveState();if(!toId)return;
+  sel=null;
+  if(editPanelOpen){
+    document.getElementById('editsb-title').textContent='Edit';
+    document.getElementById('editsb-body').innerHTML='<div class="no-sel">Select a dance box or transition on the canvas, then use this panel to edit it.</div>';
+  }
+  render();saveState();
 }
 
 function addDance(){
@@ -686,41 +784,20 @@ function addDance(){
   const last=ST.dances[ST.dances.length-1];
   const nx=last?last.x:100,ny=last?last.y+BH+160:60;
   ST.dances.push({id:newId,title:'Dance '+(ST.dances.length+1),dur:'',dancers:'',props:'',notes:'',x:nx,y:ny});
-  if(last){
-    ST.transitions.push({id:tid,from:last.id,to:newId,name:'Transition',dur:'',dancers:'',props:'',notes:'',pos:0.5});
-  }
-  sel=newId;render();renderSB(newId,'dance');
+  if(last)ST.transitions.push({id:tid,from:last.id,to:newId,name:'Transition',dur:'',dancers:'',props:'',notes:''});
+  sel=newId;render();
+  openEdit();
+  renderEdit(newId,'dance');
   const wrap=document.getElementById('cwrap');
   setTimeout(()=>wrap.scrollTo({top:Math.max(0,ny*sc-wrap.clientHeight/2),behavior:'smooth'}),50);
 }
 
-/* ── DRAGGABLE EDIT WINDOW ── */
-(function(){
-  const win=document.getElementById('editwin');
-  const head=document.getElementById('editwin-head');
-  let ox=0,oy=0,sx=0,sy=0,active=false;
-  head.addEventListener('mousedown',e=>{
-    if(e.target.classList.contains('edit-win-close'))return;
-    active=true;
-    const r=win.getBoundingClientRect();
-    ox=e.clientX-r.left;oy=e.clientY-r.top;
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove',e=>{
-    if(!active)return;
-    const x=Math.max(0,Math.min(window.innerWidth-win.offsetWidth,e.clientX-ox));
-    const y=Math.max(0,Math.min(window.innerHeight-win.offsetHeight,e.clientY-oy));
-    win.style.left=x+'px';win.style.top=y+'px';
-  });
-  document.addEventListener('mouseup',()=>{active=false});
-})();
-
-/* ── SAVE / LOAD ── */
-function saveState(){localStorage.setItem('dancePlannerState2',JSON.stringify(ST))}
+/* ═══ SAVE / LOAD ═══ */
+function saveState(){localStorage.setItem('dancePlannerV4',JSON.stringify(ST))}
 function loadState(){
-  const saved=localStorage.getItem('dancePlannerState2');
+  const saved=localStorage.getItem('dancePlannerV4');
   if(!saved)return;
-  try{ST=JSON.parse(saved)}catch(e){localStorage.removeItem('dancePlannerState2')}
+  try{ST=JSON.parse(saved)}catch(e){localStorage.removeItem('dancePlannerV4')}
 }
 loadState();
 render();
