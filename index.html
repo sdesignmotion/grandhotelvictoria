@@ -231,6 +231,30 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 </div>
 
 <script>
+
+const SUPABASE_URL = "https://eipdxgzyxjbdvywfbrbz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_av0X_OjKq6mEETzc0SvfGw_f6JYfsx2";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const PROJECT_ID = "dance_planner_main";
+
+async function syncToSupabase(){
+  await sb.from('dance_plans').upsert({
+    id: PROJECT_ID,
+    data: ST
+  });
+}
+
+let syncTimeout;
+
+function queueSync(){
+  // always keep local backup
+  localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
+
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(syncToSupabase, 600);
+}
+
 /* ═══ CONSTANTS & STATE ═══ */
 const BW=230, BH=130;
 let ST={
@@ -543,7 +567,7 @@ function render(){
     },{passive:false});
     el.addEventListener('touchend',e=>{
       clearTimeout(holdTimer);holdTimer=null;
-      if(isTouchDrag&&dragging===d.id){dragging=null;isTouchDrag=false;saveState();return}
+      if(isTouchDrag&&dragging===d.id){dragging=null;isTouchDrag=false;queueSync();return}
       isTouchDrag=false;dragging=null;
       const already=el.classList.contains('touched');
       document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
@@ -687,7 +711,7 @@ document.addEventListener('mousemove',e=>{
   }
   if(panning&&ps){px=e.clientX-ps.x;py=e.clientY-ps.y;applyT()}
 });
-document.addEventListener('mouseup',()=>{if(dragging)saveState();dragging=null;panning=false});
+document.addEventListener('mouseup',()=>{if(dragging)queueSync();dragging=null;panning=false});
 
 /* canvas pan + deselect */
 document.getElementById('cwrap').addEventListener('mousedown',e=>{
@@ -801,8 +825,8 @@ function toggleOv(){
 }
 
 /* ═══ DATA ═══ */
-function ud(id,f,v){const d=ST.dances.find(x=>x.id===id);if(d)d[f]=v;saveState();render()}
-function ut(id,f,v){const t=ST.transitions.find(x=>x.id===id);if(t)t[f]=v;saveState();render()}
+function ud(id,f,v){const d=ST.dances.find(x=>x.id===id);if(d)d[f]=v;queueSync();render()}
+function ut(id,f,v){const t=ST.transitions.find(x=>x.id===id);if(t)t[f]=v;queueSync();render()}
 
 function rmDance(id){
   if(ST.dances.length<=1)return;
@@ -813,7 +837,7 @@ function rmDance(id){
     document.getElementById('editsb-title').textContent='Edit';
     document.getElementById('editsb-body').innerHTML='<div class="no-sel">Select a dance box or transition on the canvas, then use this panel to edit it.</div>';
   }
-  render();saveState();
+  render();queueSync();
 }
 
 function addDance(){
@@ -830,13 +854,60 @@ function addDance(){
 }
 
 /* ═══ SAVE / LOAD ═══ */
-function saveState(){localStorage.setItem('dancePlannerV4',JSON.stringify(ST))}
+function saveState(){
+  queueSync(); // handles BOTH local + cloud safely
+}
 function loadState(){
   const saved=localStorage.getItem('dancePlannerV4');
   if(!saved)return;
   try{ST=JSON.parse(saved)}catch(e){localStorage.removeItem('dancePlannerV4')}
 }
-loadState();
+  
+async function loadState(){
+
+  const local = localStorage.getItem('dancePlannerV4');
+  let localData = null;
+
+  if(local){
+    try {
+      localData = JSON.parse(local);
+    } catch(e){}
+  }
+
+  const { data, error } = await sb
+    .from('dance_plans')
+    .select('data')
+    .eq('id', PROJECT_ID)
+    .single();
+
+  const cloudData = data?.data;
+
+  // CASE 1: only local exists
+  if(localData && !cloudData){
+    ST = localData;
+  }
+
+  // CASE 2: only cloud exists
+  else if(cloudData && !localData){
+    ST = cloudData;
+  }
+
+  // CASE 3: both exist → ASK USER (SAFE MODE)
+  else if(localData && cloudData){
+    const useCloud = confirm(
+      "Cloud version exists.\nClick OK to load CLOUD version\nCancel to keep LOCAL version"
+    );
+
+    ST = useCloud ? cloudData : localData;
+  }
+
+  // CASE 4: nothing exists
+  else if(!localData && !cloudData){
+    // keep default ST
+  }
+
+  render();
+}
 render();
 </script>
 </body>
