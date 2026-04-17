@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.3, maximum-scale=5.0, user-scalable=yes">
 <title>Dance Show Planner</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -38,7 +39,6 @@ header h1 span{font-weight:300;color:var(--muted)}
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
   overflow:hidden;
-  /* slide in/out */
   margin-left:calc(-1 * var(--sidebar));
   transition:margin-left .22s ease;
   z-index:200;
@@ -94,7 +94,6 @@ header h1 span{font-weight:300;color:var(--muted)}
   box-shadow:0 4px 20px rgba(0,0,0,.14);padding:6px 0;pointer-events:auto;
 }
 .box-dd::before,.tw-dd::before{content:'';position:absolute;top:-10px;left:0;right:0;height:10px}
-/* show on hover OR when .touched is set */
 .dance-node:hover .box-dd,.box-dd:hover,
 .dance-node.touched .box-dd{display:block}
 .tw:hover .tw-dd,.tw-dd:hover,
@@ -109,12 +108,10 @@ header h1 span{font-weight:300;color:var(--muted)}
 .ddw{font-size:10px;color:var(--muted);font-style:italic;text-align:right;line-height:1.4}
 .dde{padding:6px 12px;font-size:11px;color:var(--muted);font-style:italic}
 
-/* ── TRANSITION WIDGET (fixed at bezier midpoint, not draggable) ── */
+/* ── TRANSITION WIDGET ── */
 .tw{position:absolute;z-index:50;transform:translate(-50%,-50%);pointer-events:auto}
 .tw:hover,
-.tw.touched {
-  z-index: 10000;
-}
+.tw.touched {z-index: 10000;}
 .tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;
   font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;
   box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;
@@ -246,11 +243,8 @@ async function syncToSupabase(){
 }
 
 let syncTimeout;
-
 function queueSync(){
-  // always keep local backup
   localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
-
   clearTimeout(syncTimeout);
   syncTimeout = setTimeout(syncToSupabase, 600);
 }
@@ -295,10 +289,7 @@ function wip(name){
 function allD(){const s=new Set();ST.dances.forEach(d=>gd(d.dancers).forEach(n=>s.add(n)));return[...s].sort()}
 function allP(){const s=new Set();ST.dances.forEach(d=>gp(d.props).forEach(p=>s.add(p)));return[...s].sort()}
 
-/* ═══ HIGHLIGHT
-   Works by querying live DOM elements by data-id,
-   so it always finds the current rendered nodes.
-═══ */
+/* ═══ HIGHLIGHT ═══ */
 function clearHL(){
   document.querySelectorAll('.dance-node').forEach(n=>{
     n.classList.remove('dim');
@@ -309,7 +300,6 @@ function clearHL(){
 }
 
 function applyHL(ids){
-  // ids = Set of dance/transition ids that MATCH
   document.querySelectorAll('.dance-node').forEach(n=>{
     const b=n.querySelector('.dance-box');
     if(ids.has(n.dataset.id)){
@@ -376,24 +366,18 @@ function ddRows(dancers,props,dl){
   return h;
 }
 
-/* ═══ BEZIER: transition box locked at midpoint ═══ */
+/* ═══ BEZIER ═══ */
 function getAnchorPoints(A, B) {
   const axc = A.x + BW / 2;
   const ayc = A.y + BH / 2;
   const bxc = B.x + BW / 2;
   const byc = B.y + BH / 2;
-
   const dx = bxc - axc;
   const dy = byc - ayc;
-
-  const H_THRESHOLD = 120; // 👈 prevents jitter
-
+  const H_THRESHOLD = 120;
   let ax, ay, bx, by;
-
-  // Only use horizontal if it's clearly horizontal
   if (Math.abs(dx) > Math.abs(dy) + H_THRESHOLD) {
     if (dx > 0) {
-      // A → right, B → left
       ax = A.x + BW; ay = ayc;
       bx = B.x;      by = byc;
     } else {
@@ -401,7 +385,6 @@ function getAnchorPoints(A, B) {
       bx = B.x + BW; by = byc;
     }
   } else {
-    // default vertical (stable)
     if (dy > 0) {
       ax = axc; ay = A.y + BH;
       bx = bxc; by = B.y;
@@ -410,7 +393,6 @@ function getAnchorPoints(A, B) {
       bx = bxc; by = B.y + BH;
     }
   }
-
   return { ax, ay, bx, by };
 }
 function getBezier(A,B){
@@ -418,7 +400,6 @@ function getBezier(A,B){
   const gap = Math.max(120, Math.abs(by - ay));
   const cp1x=ax, cp1y=ay+gap*0.45;
   const cp2x=bx, cp2y=by-gap*0.45;
-  // t=0.5: B(0.5)=0.125*P0+0.375*P1+0.375*P2+0.125*P3
   const mx=0.125*ax+0.375*cp1x+0.375*cp2x+0.125*bx;
   const my=0.125*ay+0.375*cp1y+0.375*cp2y+0.125*by;
   return {ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y,mx,my};
@@ -435,13 +416,11 @@ function drawLines(){
     const {ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y}=getBezier(A,B);
     const pd=`M${ax},${ay} C${cp1x},${cp1y} ${cp2x},${cp2y} ${bx},${by}`;
 
-    // glow
     const glow=document.createElementNS('http://www.w3.org/2000/svg','path');
     glow.setAttribute('d',pd);glow.setAttribute('fill','none');
     glow.setAttribute('stroke','rgba(74,130,212,0.13)');glow.setAttribute('stroke-width','9');
     glow.setAttribute('stroke-linecap','round');svg.appendChild(glow);
 
-    // dashed animated line
     const line=document.createElementNS('http://www.w3.org/2000/svg','path');
     line.setAttribute('d',pd);line.setAttribute('fill','none');
     line.setAttribute('stroke','#4a82d4');line.setAttribute('stroke-width','2');
@@ -453,7 +432,6 @@ function drawLines(){
     anim.setAttribute('dur','1.4s');anim.setAttribute('repeatCount','indefinite');
     line.appendChild(anim);svg.appendChild(line);
 
-    // dots at endpoints
     [[ax,ay,'#c5d9f5'],[bx,by,'#4a82d4']].forEach(([cx,cy,col])=>{
       const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
       c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','4.5');
@@ -469,7 +447,6 @@ function render(){
   canvas.querySelectorAll('.dance-node,.tw').forEach(e=>e.remove());
   drawLines();
 
-  /* Transition widgets — positioned at bezier midpoint, NOT draggable */
   ST.transitions.forEach(t=>{
     const A=ST.dances.find(d=>d.id===t.from);
     const B=ST.dances.find(d=>d.id===t.to);
@@ -493,10 +470,8 @@ function render(){
     dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
 
     wrap.appendChild(box);wrap.appendChild(dd);
-    // hover
     wrap.addEventListener('mouseenter',()=>dd.style.display='block');
     wrap.addEventListener('mouseleave',()=>dd.style.display='none');
-    // touch tap
     wrap.addEventListener('touchstart',e=>{
       e.stopPropagation();
       const already=wrap.classList.contains('touched');
@@ -508,7 +483,6 @@ function render(){
     canvas.appendChild(wrap);
   });
 
-  /* Dance boxes */
   ST.dances.forEach((d,i)=>{
     const el=document.createElement('div');
     el.className='dance-node';el.dataset.id=d.id;
@@ -531,7 +505,6 @@ function render(){
         <div class="box-dd">${ddRows(gd(d.dancers),gp(d.props),true)}</div>
       </div>`;
 
-    // desktop: click = edit, drag = move
     el.querySelector('.dance-box').addEventListener('click',e=>{
       e.stopPropagation();
       clearHL();activeHl=null;
@@ -539,7 +512,6 @@ function render(){
     });
     el.addEventListener('mousedown',e=>startDrag(e,d.id));
 
-    /* mobile touch: hold = drag, tap = info, double-tap = edit */
     let holdTimer=null,isTouchDrag=false,tSX=0,tSY=0,tId=null;
     el.addEventListener('touchstart',e=>{
       if(e.touches.length!==1)return;
@@ -594,15 +566,11 @@ function closeEdit(){
   document.getElementById('editbtn').classList.remove('btn-active');
 }
 
-/* Toggle the edit panel on/off from the header button.
-   If a node is already selected, open/close shows/hides it.
-   If nothing is selected and panel opens, show the empty prompt. */
 function toggleEditPanel(){
   if(editPanelOpen){
     closeEdit();
   } else {
     openEdit();
-    // if something is already selected, show its form
     if(sel){
       const d=ST.dances.find(x=>x.id===sel);
       const t=ST.transitions.find(x=>x.id===sel);
@@ -615,9 +583,6 @@ function toggleEditPanel(){
   }
 }
 
-/* Clicking a box just selects it (highlights border).
-   It does NOT open the edit panel automatically.
-   If the edit panel is already open it updates the form content. */
 function selNode(id,type){
   clearHL();activeHl=null;
   sel=id;
@@ -713,7 +678,6 @@ document.addEventListener('mousemove',e=>{
 });
 document.addEventListener('mouseup',()=>{if(dragging)queueSync();dragging=null;panning=false});
 
-/* canvas pan + deselect */
 document.getElementById('cwrap').addEventListener('mousedown',e=>{
   if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
     panning=true;ps={x:e.clientX-px,y:e.clientY-py};e.preventDefault();
@@ -776,7 +740,6 @@ document.getElementById('cwrap').addEventListener('touchend',e=>{
   if(e.touches.length===0){panning=false;ps=null;}
 },{passive:true});
 
-/* tap empty canvas → clear everything */
 document.addEventListener('touchstart',e=>{
   if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
     document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
@@ -853,62 +816,43 @@ function addDance(){
   setTimeout(()=>wrap.scrollTo({top:Math.max(0,ny*sc-wrap.clientHeight/2),behavior:'smooth'}),50);
 }
 
-/* ═══ SAVE / LOAD ═══ */
-function saveState(){
-  queueSync(); // handles BOTH local + cloud safely
-}
-function loadState(){
-  const saved=localStorage.getItem('dancePlannerV4');
-  if(!saved)return;
-  try{ST=JSON.parse(saved)}catch(e){localStorage.removeItem('dancePlannerV4')}
-}
-  
-async function loadState(){
-
+/* ═══ INIT: load state then render ═══ */
+async function init(){
   const local = localStorage.getItem('dancePlannerV4');
   let localData = null;
-
   if(local){
-    try {
-      localData = JSON.parse(local);
-    } catch(e){}
+    try { localData = JSON.parse(local); } catch(e){}
   }
 
-  const { data, error } = await sb
-    .from('dance_plans')
-    .select('data')
-    .eq('id', PROJECT_ID)
-    .single();
+  try {
+    const { data } = await sb
+      .from('dance_plans')
+      .select('data')
+      .eq('id', PROJECT_ID)
+      .single();
 
-  const cloudData = data?.data;
+    const cloudData = data?.data;
 
-  // CASE 1: only local exists
-  if(localData && !cloudData){
-    ST = localData;
-  }
-
-  // CASE 2: only cloud exists
-  else if(cloudData && !localData){
-    ST = cloudData;
-  }
-
-  // CASE 3: both exist → ASK USER (SAFE MODE)
-  else if(localData && cloudData){
-    const useCloud = confirm(
-      "Cloud version exists.\nClick OK to load CLOUD version\nCancel to keep LOCAL version"
-    );
-
-    ST = useCloud ? cloudData : localData;
-  }
-
-  // CASE 4: nothing exists
-  else if(!localData && !cloudData){
-    // keep default ST
+    if(localData && !cloudData){
+      ST = localData;
+    } else if(cloudData && !localData){
+      ST = cloudData;
+    } else if(localData && cloudData){
+      const useCloud = confirm(
+        "Cloud version exists.\nClick OK to load CLOUD version\nCancel to keep LOCAL version"
+      );
+      ST = useCloud ? cloudData : localData;
+    }
+    // else: no saved data → keep default ST
+  } catch(e){
+    // Supabase unavailable — fall back to local if available
+    if(localData) ST = localData;
   }
 
   render();
 }
-render();
+
+init();
 </script>
 </body>
 </html>
