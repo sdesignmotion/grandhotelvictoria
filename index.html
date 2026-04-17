@@ -111,6 +111,10 @@ header h1 span{font-weight:300;color:var(--muted)}
 
 /* ── TRANSITION WIDGET (fixed at bezier midpoint, not draggable) ── */
 .tw{position:absolute;z-index:50;transform:translate(-50%,-50%);pointer-events:auto}
+.tw:hover,
+.tw.touched {
+  z-index: 10000;
+}
 .tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;
   font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;
   box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;
