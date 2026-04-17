@@ -182,6 +182,9 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
     <button class="btn btn-primary" onclick="addDance()">+ Dance</button>
     <button class="btn" id="editbtn" onclick="toggleEditPanel()" title="Open/close edit panel">&#x270E; Edit</button>
     <button class="btn" onclick="toggleOv()">Overview</button>
+    <button class="btn" onclick="exportJSON()" title="Download backup JSON">&#x2B07; Export</button>
+    <button class="btn" onclick="document.getElementById('importInput').click()" title="Load from JSON file">&#x2B06; Import</button>
+    <input type="file" id="importInput" accept=".json,.rtf,.txt" style="display:none" onchange="importJSON(event)">
   </div>
 </header>
 
@@ -251,20 +254,9 @@ function queueSync(){
 
 /* ═══ CONSTANTS & STATE ═══ */
 const BW=230, BH=130;
-let ST={
-  dances:[
-    {id:'d1',title:'Opening Number',dur:'3:30',dancers:'Anna, Mia, Luca, Sofia',props:'Fans, Scarves',notes:'Full ensemble on stage',x:100,y:60},
-    {id:'d2',title:'Solo — Mia',dur:'2:15',dancers:'Mia',props:'None',notes:'Spotlight center stage',x:100,y:330},
-    {id:'d3',title:'Duet — Luca & Sofia',dur:'4:00',dancers:'Luca, Sofia',props:'Ribbons',notes:'Blue lighting at 1:30',x:100,y:600},
-    {id:'d4',title:'Finale',dur:'5:00',dancers:'Anna, Mia, Luca, Sofia',props:'Flags, Confetti',notes:'Curtain call follows',x:100,y:870},
-  ],
-  transitions:[
-    {id:'t1',from:'d1',to:'d2',name:'Interval I',dur:'1:00',dancers:'Anna exits, Mia stays',props:'Remove fans, add chairs',notes:'Stage right wings'},
-    {id:'t2',from:'d2',to:'d3',name:'Interval II',dur:'0:45',dancers:'Mia exits, Luca + Sofia enter',props:'Clear all props',notes:''},
-    {id:'t3',from:'d3',to:'d4',name:'Finale setup',dur:'1:30',dancers:'All dancers enter',props:'Add finale flags',notes:'Full blackout'},
-  ]
-};
-let nid=5, sel=null, sc=1, px=0, py=0;
+const DEFAULT_ST = {"dances":[{"id":"d1","title":"ВИДЕО ПОГРЕБЕНИЕ","dur":"0:30","dancers":"","props":"","notes":"","x":101,"y":48},{"id":"d2","title":"1. УЛАЛА","dur":"5:00","dancers":"Ян, Петра, Светльо, Бети, Тейси, Климент, Катя, Настя, Кирил, Марианна, Софи, Бобо, Колцата, Лили, Саши, Йоли, Мишето, Вики, ","props":"","notes":"4:00 танц + 1:00 монолог","x":617,"y":45},{"id":"d3","title":"2. СЕАНС","dur":"2:53","dancers":"Петра, Марианна, Софи, Катя","props":"","notes":"накрая се появява духът","x":1076.3266925569042,"y":0},{"id":"d4","title":"3. СОЛО ДУХ","dur":"3:40","dancers":"Бети","props":"","notes":"","x":1444,"y":41},{"id":"d5","title":"4. ПЛЕМЕННИК танц","dur":"5:00","dancers":"Мишо, Ян, Климент, Колцата, Кирил, Бобо","props":"столове, бар, 1 маса","notes":"","x":1525,"y":281},{"id":"d7","title":"5. СЕМЕЙСТВО и ПИКОЛО","dur":"3:00","dancers":"Светльо, Петра, Кирил, Катя, Ян","props":"","notes":"","x":1091,"y":286},{"id":"d9","title":"6. Адиос","dur":"2:55","dancers":"Петра, Светльо","props":"обстановка-бар , 2 маси , обстановка рецепция","notes":"","x":603.8173420687783,"y":357.2188989845903},{"id":"d11","title":"7. ГОТВАЧИ","dur":"2:45","dancers":"Кирил, Светльо, Катя, Ян, Бобо, Климент, Мишо, Васко, Тейси, Марианна, Лили, Саши, Колцата, Мишето, Йоли, Вики, Настя, ","props":"5 маси , обстановка кухня , 5 точилки, 5 купи, 5 солници, 5 ножове, 5 бъркалки, магнезий, 4 табли, 5 покривки ","notes":"","x":99.03750113830048,"y":212.61294968795593},{"id":"d13","title":"8. Соло КАМЕРИЕРКА","dur":"4:30","dancers":"","props":"риза, сако, кърпичка ","notes":"","x":102.97889139012017,"y":759.5596316829036},{"id":"d15","title":"9. LOVEFOOL","dur":"3:13","dancers":"Ян ,Колцата ,Климент, Васко, Бобо, Настя, Йоли, Марианна, Тейси, Софи","props":"обстановка стая","notes":"","x":527.7320004485277,"y":565.590368512504},{"id":"d17","title":"10. СЕСТРА","dur":"4:30","dancers":"Вики, Катя,Тейси,Петра,","props":"","notes":"","x":946.3993884343835,"y":566.2970070121044},{"id":"d19","title":"11. КАМЕРИЕРКИ ","dur":"3:40","dancers":"Марианна,Тейси,Софи,Петра,Саши,Лили,Йоли,Мишето,Катя,Настя","props":"обстановка пентхаус , рокли,халати,бърсалки ,парцалчета,бои,тоалетка,шендери,куфар,шапки,пера","notes":"","x":1421.534089916152,"y":560.7077913865771},{"id":"d21","title":"12. ДУЕТ СЕСТРИ","dur":"3:00","dancers":"Бети,Вики","props":"","notes":"","x":1423.3777605293633,"y":876.0439790647016},{"id":"d23","title":"13. МИРОРС","dur":"3:10","dancers":"Васко,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Мишето,Лили,Саши,Климент,Кирил,Тейси,Светльо","props":"4 платна, обастановка ателие","notes":"","x":971.5777467205259,"y":806.9731017492177},{"id":"d25","title":"14. ХУДОЖНИК","dur":"5:00","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо","props":"","notes":"","x":555.0924161843485,"y":831.1646070734932},{"id":"d27","title":"15. Дует ПИКОЛО и ДУХ","dur":"2:30","dancers":"Ян,Бети","props":"","notes":"смяна обстановка в края на дуета, да са на втора сцена и да се озоват пред стая 13 ","x":135.77188361331622,"y":988.6918118907464},{"id":"d29","title":"16. СТАЯ 13 ","dur":"3:15","dancers":"Климент,Тейси,Кирил,Мишо,Светльо.Колцата,Настя,Мишето","props":"обстановка стая 13 ","notes":"","x":130.26898948508745,"y":1273.1889177625178},{"id":"d31","title":"17. ХОТЕЛ 2","dur":"2:30","dancers":"","props":"","notes":"","x":506.6669478559353,"y":1163.6788040531092},{"id":"d33","title":"18. ТРИО","dur":"2:30","dancers":"Петра,Бобо,Колцата","props":"стълба,моп,","notes":"обстановка рецепция","x":920.4845862987387,"y":1142.2149963953605},{"id":"d35","title":"19. АДВОКАТИ ","dur":"2:30","dancers":"","props":"5 маси","notes":"","x":1347.9125067545476,"y":1060.6226894323522},{"id":"d37","title":"20. Тайни Кроежи и отказ от завещанието","dur":"3:00","dancers":"","props":"","notes":"","x":1551.1162533937556,"y":1301.7938849986829},{"id":"d39","title":"21. КАЛАШНИКОВ","dur":"2:30","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо,Ян","props":"обстановка вечеря","notes":"","x":1125.934530473612,"y":1473.274795717161},{"id":"d41","title":"22. ДУХ ОБЩО","dur":"2:00","dancers":"Петра,Бети,Ян,Светльо,Васко,Вики,Мишо,Катя,Кирил","props":"","notes":"","x":823.7945452117186,"y":1467.4854479297412},{"id":"d43","title":"23. ПОКЛОН","dur":"4:00","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо,Ян","props":"","notes":"","x":346.3812980281992,"y":1578.911801031954}],"transitions":[{"id":"t1","from":"d1","to":"d2","name":"ПИКОЛО ЧЕТЕ ПИСМО НА СЦЕНА","dur":"0:20","dancers":"Ян","props":"","notes":""},{"id":"t2","from":"d2","to":"d3","name":"ПРЕХОД СЕАНС + племенник","dur":"0:20","dancers":"","props":"Изнасяне на реквизит","notes":""},{"id":"t3","from":"d3","to":"d4","name":"няма","dur":"","dancers":"","props":"","notes":""},{"id":"t6","from":"d4","to":"d5","name":"КАМЕРИЕРКИ","dur":"1:00","dancers":"Софи, Марианна, Ян","props":"","notes":""},{"id":"t8","from":"d5","to":"d7","name":"СЕМЕЙСТВО пристига","dur":"0:40","dancers":"Светльо, Петра, Кирил, Катя, Ян","props":"","notes":""},{"id":"t10","from":"d7","to":"d9","name":"","dur":"","dancers":"","props":"","notes":""},{"id":"t12","from":"d9","to":"d11","name":"децата и пиколо към кухня ","dur":"0:25","dancers":"Ян, Кирил, Катя ","props":"5 Маси","notes":"смяна обстановка"},{"id":"t14","from":"d11","to":"d13","name":"КЪМ СТАЯ ПИКОЛО","dur":"0:20","dancers":"","props":"легло щендер сако риза обастановка стая пиколо","notes":"смяна обстановка"},{"id":"t16","from":"d13","to":"d15","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t18","from":"d15","to":"d17","name":"преход ПЕНТХАУС","dur":"0:20","dancers":"Ян","props":"смяна обстановка на пентхаус ","notes":""},{"id":"t20","from":"d17","to":"d19","name":"СЕСТРА и ПЛЕМЕННИК","dur":"0:30","dancers":"Мишо, Вики ","props":"","notes":"показваме връзка"},{"id":"t22","from":"d19","to":"d21","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t24","from":"d21","to":"d23","name":"пиколо соло ,Стая 13 и Тейси","dur":"1:00","dancers":"Ян, Тейси ","props":"смяна обстановка от пентхаус към ателие художник","notes":""},{"id":"t26","from":"d23","to":"d25","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t28","from":"d25","to":"d27","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t30","from":"d27","to":"d29","name":"","dur":"","dancers":"","props":"","notes":""},{"id":"t32","from":"d29","to":"d31","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t34","from":"d31","to":"d33","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t36","from":"d33","to":"d35","name":"ТРЯБВА НИ ТРАНЗИШЪН","dur":"","dancers":"","props":"","notes":""},{"id":"t38","from":"d35","to":"d37","name":"Завещание Саша","dur":"1:00","dancers":"","props":"","notes":""},{"id":"t40","from":"d37","to":"d39","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t42","from":"d39","to":"d41","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t44","from":"d41","to":"d43","name":"погребение-видео","dur":"0:20","dancers":"","props":"","notes":""}]};
+let ST = JSON.parse(JSON.stringify(DEFAULT_ST));
+let nid=50, sel=null, sc=1, px=0, py=0;
 let panning=false, ps=null;
 let dragging=null, doff={x:0,y:0};
 
@@ -814,6 +806,48 @@ function addDance(){
   renderEdit(newId,'dance');
   const wrap=document.getElementById('cwrap');
   setTimeout(()=>wrap.scrollTo({top:Math.max(0,ny*sc-wrap.clientHeight/2),behavior:'smooth'}),50);
+}
+
+/* ═══ EXPORT / IMPORT ═══ */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(ST, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dancePlannerV4-backup.json';
+  a.click();
+}
+
+function importJSON(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      let text = ev.target.result;
+      // strip RTF wrapper if needed
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if(!jsonMatch) throw new Error('No JSON found');
+      const parsed = JSON.parse(jsonMatch[0]);
+      if(!parsed.dances || !parsed.transitions) throw new Error('Invalid format');
+      if(!confirm('Replace current plan with imported data?')) return;
+      ST = parsed;
+      // recalculate nid so new additions don't collide
+      let maxId = 0;
+      [...ST.dances, ...ST.transitions].forEach(x => {
+        const n = parseInt((x.id||'').replace(/\D/g,''));
+        if(!isNaN(n) && n > maxId) maxId = n;
+      });
+      nid = maxId + 1;
+      sel = null;
+      queueSync();
+      render();
+      alert('Imported successfully: ' + ST.dances.length + ' dances, ' + ST.transitions.length + ' transitions.');
+    } catch(err) {
+      alert('Import failed: ' + err.message);
+    }
+    e.target.value = ''; // reset so same file can be re-imported
+  };
+  reader.readAsText(file, 'utf-8');
 }
 
 /* ═══ INIT: load state then render ═══ */
