@@ -259,10 +259,43 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const PROJECT_ID = "dance_planner_main";
 
 async function syncToSupabase(){
-  await sb.from('dance_plans').upsert({
-    id: PROJECT_ID,
-    data: ST
-  });
+  try {
+    const { error } = await sb.from('dance_plans').upsert({
+      id: PROJECT_ID,
+      data: ST
+    }, { onConflict: 'id' });
+    if(error){
+      console.error('Supabase sync error:', error.message, error.code, error.details);
+      showSyncStatus('error');
+    } else {
+      showSyncStatus('ok');
+    }
+  } catch(e){
+    console.error('Supabase network error:', e);
+    showSyncStatus('error');
+  }
+}
+
+function showSyncStatus(state){
+  let el = document.getElementById('sync-status');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'sync-status';
+    el.style.cssText = 'position:fixed;bottom:60px;right:16px;font-size:10px;padding:4px 10px;border-radius:12px;z-index:9999;pointer-events:none;transition:opacity 1s;font-family:monospace';
+    document.body.appendChild(el);
+  }
+  if(state === 'ok'){
+    el.textContent = '☁ saved';
+    el.style.background = '#d4edda';
+    el.style.color = '#155724';
+    el.style.opacity = '1';
+    setTimeout(()=>{ el.style.opacity='0'; }, 2000);
+  } else {
+    el.textContent = '⚠ cloud save failed — check console';
+    el.style.background = '#f8d7da';
+    el.style.color = '#721c24';
+    el.style.opacity = '1';
+  }
 }
 
 let syncTimeout;
@@ -906,8 +939,9 @@ async function init(){
       await syncToSupabase();
     }
   } catch(e){
-    // Network error — local data already shown above, nothing more to do
+    // Network error — local data already shown above
     console.warn('Cloud unavailable, using local data:', e);
+    showSyncStatus('error');
   }
 }
 
