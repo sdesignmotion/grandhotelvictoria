@@ -267,10 +267,17 @@ async function syncToSupabase(){
 
 let syncTimeout;
 function queueSync(){
+  // Always keep local backup instantly
   localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
+  // Debounce cloud sync to 800ms — but also flush on page hide
   clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(syncToSupabase, 600);
+  syncTimeout = setTimeout(syncToSupabase, 800);
 }
+// Flush to cloud immediately if user closes/hides tab
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden') syncToSupabase();
+});
+window.addEventListener('pagehide', () => syncToSupabase());
 
 /* ═══ CONSTANTS & STATE ═══ */
 const BW=230, BH=130;
@@ -872,38 +879,36 @@ function importJSON(e){
 
 /* ═══ INIT: load state then render ═══ */
 async function init(){
+  // Step 1: show local data instantly so UI isn't blank
   const local = localStorage.getItem('dancePlannerV4');
   let localData = null;
   if(local){
     try { localData = JSON.parse(local); } catch(e){}
   }
+  if(localData) { ST = localData; render(); }
+  else render(); // show default while cloud loads
 
+  // Step 2: fetch cloud — ALWAYS wins over local (source of truth)
   try {
-    const { data } = await sb
+    const { data, error } = await sb
       .from('dance_plans')
       .select('data')
       .eq('id', PROJECT_ID)
       .single();
 
-    const cloudData = data?.data;
-
-    if(localData && !cloudData){
-      ST = localData;
-    } else if(cloudData && !localData){
-      ST = cloudData;
-    } else if(localData && cloudData){
-      const useCloud = confirm(
-        "Cloud version exists.\nClick OK to load CLOUD version\nCancel to keep LOCAL version"
-      );
-      ST = useCloud ? cloudData : localData;
+    if(!error && data?.data?.dances){
+      ST = data.data;
+      // Update local cache to match cloud
+      localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
+      render();
+    } else if(!localData){
+      // No cloud row yet — push our default up so others see it
+      await syncToSupabase();
     }
-    // else: no saved data → keep default ST
   } catch(e){
-    // Supabase unavailable — fall back to local if available
-    if(localData) ST = localData;
+    // Network error — local data already shown above, nothing more to do
+    console.warn('Cloud unavailable, using local data:', e);
   }
-
-  render();
 }
 
 init();
