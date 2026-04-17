@@ -354,15 +354,41 @@ function ddRows(dancers,props,dl){
 
 /* ═══ BEZIER: transition box locked at midpoint ═══ */
 function getAnchorPoints(A, B) {
-  const ax = A.x + BW / 2;
-  const ay = A.y + BH;
+  const axc = A.x + BW / 2;
+  const ayc = A.y + BH / 2;
+  const bxc = B.x + BW / 2;
+  const byc = B.y + BH / 2;
 
-  const bx = B.x + BW / 2;
-  const by = B.y;
+  const dx = bxc - axc;
+  const dy = byc - ayc;
+
+  const H_THRESHOLD = 120; // 👈 prevents jitter
+
+  let ax, ay, bx, by;
+
+  // Only use horizontal if it's clearly horizontal
+  if (Math.abs(dx) > Math.abs(dy) + H_THRESHOLD) {
+    if (dx > 0) {
+      // A → right, B → left
+      ax = A.x + BW; ay = ayc;
+      bx = B.x;      by = byc;
+    } else {
+      ax = A.x;      ay = ayc;
+      bx = B.x + BW; by = byc;
+    }
+  } else {
+    // default vertical (stable)
+    if (dy > 0) {
+      ax = axc; ay = A.y + BH;
+      bx = bxc; by = B.y;
+    } else {
+      ax = axc; ay = A.y;
+      bx = bxc; by = B.y + BH;
+    }
+  }
 
   return { ax, ay, bx, by };
 }
-
 function getBezier(A,B){
   const { ax, ay, bx, by } = getAnchorPoints(A, B);
   const gap = Math.max(120, Math.abs(by - ay));
