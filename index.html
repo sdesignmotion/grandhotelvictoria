@@ -304,12 +304,10 @@ function applyHL(ids){
 
 function hld(name, on){
   if(!on||!name){clearHL();return}
-  closeEdit(); // close edit panel when hovering a name
   applyHL(new Set(wid(name).map(l=>l.id)));
 }
 function hlp(name, on){
   if(!on||!name){clearHL();return}
-  closeEdit(); // close edit panel when hovering a prop
   applyHL(new Set(wip(name).map(l=>l.id)));
 }
 
