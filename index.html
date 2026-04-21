@@ -910,18 +910,35 @@ function importJSON(e){
   reader.readAsText(file, 'utf-8');
 }
 
+/* ═══ REALTIME SYNC ═══ */
+function subscribeRealtime() {
+  sb.channel('dance_plan_updates')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'dance_plans', filter: `id=eq.${PROJECT_ID}` },
+      (payload) => {
+        // Only apply if this tab didn't just trigger the save
+        // (syncTimeout being set means WE just saved; skip our own echo)
+        if (syncTimeout) return;
+        if (payload.new?.data?.dances) {
+          ST = payload.new.data;
+          localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
+          render();
+          showSyncStatus('ok');
+        }
+      }
+    )
+    .subscribe();
+}
+  
 /* ═══ INIT: load state then render ═══ */
 async function init(){
-  // Step 1: show local data instantly so UI isn't blank
   const local = localStorage.getItem('dancePlannerV4');
   let localData = null;
-  if(local){
-    try { localData = JSON.parse(local); } catch(e){}
-  }
+  if(local){ try { localData = JSON.parse(local); } catch(e){} }
   if(localData) { ST = localData; render(); }
-  else render(); // show default while cloud loads
+  else render();
 
-  // Step 2: fetch cloud — ALWAYS wins over local (source of truth)
   try {
     const { data, error } = await sb
       .from('dance_plans')
@@ -931,18 +948,18 @@ async function init(){
 
     if(!error && data?.data?.dances){
       ST = data.data;
-      // Update local cache to match cloud
       localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
       render();
     } else if(!localData){
-      // No cloud row yet — push our default up so others see it
       await syncToSupabase();
     }
   } catch(e){
-    // Network error — local data already shown above
     console.warn('Cloud unavailable, using local data:', e);
     showSyncStatus('error');
   }
+
+  // Subscribe AFTER initial load
+  subscribeRealtime();
 }
 
 init();
