@@ -22,41 +22,36 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 14px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:300;position:relative}
 header h1{font-size:14px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
 header h1 span{font-weight:300;color:var(--muted)}
-.hbtns{display:flex;gap:6px;margin-left:auto}
+.hbtns{display:flex;gap:6px;margin-left:auto;align-items:center}
 .btn{font-family:var(--font);font-size:12px;font-weight:500;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text);transition:all .15s;white-space:nowrap;touch-action:manipulation}
 .btn:hover{background:var(--bg)}
 .btn-primary{background:var(--b800);color:#fff;border-color:var(--b800)}
 .btn-primary:hover,.btn-primary:active{background:var(--b600);border-color:var(--b600)}
+
+/* ── SYNC PILL ── */
+#sync-pill{
+  font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:12px;
+  transition:all .4s;white-space:nowrap;flex-shrink:0;
+}
+#sync-pill.ok{background:#d4edda;color:#155724}
+#sync-pill.err{background:#f8d7da;color:#721c24}
+#sync-pill.saving{background:#fff3cd;color:#856404}
+#sync-pill.hidden{opacity:0;pointer-events:none}
 
 /* ── LAYOUT ── */
 .main{display:flex;flex:1;overflow:hidden}
 
 /* ── EDIT SIDEBAR (left, fixed width, slides in) ── */
 .edit-sidebar{
-  width:var(--sidebar);
-  flex-shrink:0;
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  margin-left:calc(-1 * var(--sidebar));
-  transition:margin-left .22s ease;
-  z-index:200;
+  width:var(--sidebar);flex-shrink:0;background:var(--surface);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  overflow:hidden;margin-left:calc(-1 * var(--sidebar));
+  transition:margin-left .22s ease;z-index:200;
 }
 .edit-sidebar.open{margin-left:0}
-.edit-sb-head{
-  padding:12px 14px 12px 16px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
+.edit-sb-head{padding:12px 14px 12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .edit-sb-title{font-size:13px;font-weight:600;color:var(--muted)}
-.edit-sb-close{
-  width:24px;height:24px;border-radius:50%;border:none;
-  background:#e0ddd8;color:var(--text);font-size:14px;line-height:1;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:background .15s;flex-shrink:0;touch-action:manipulation;
-}
+.edit-sb-close{width:24px;height:24px;border-radius:50%;border:none;background:#e0ddd8;color:var(--text);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;touch-action:manipulation}
 .edit-sb-close:hover{background:#ccc}
 .edit-sb-body{overflow-y:auto;flex:1 1 0;padding:12px;-webkit-overflow-scrolling:touch}
 
@@ -86,18 +81,10 @@ header h1 span{font-weight:300;color:var(--muted)}
 .dnotes{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4;border-top:1px solid rgba(74,130,212,.12);padding-top:6px}
 
 /* ── HOVER DROPDOWNS ── */
-.box-dd,.tw-dd{
-  display:none;position:absolute;
-  top:calc(100% + 4px);left:50%;transform:translateX(-50%);
-  background:#fff;border:1px solid var(--border);border-radius:8px;
-  min-width:230px;max-width:270px;z-index:99999;
-  box-shadow:0 4px 20px rgba(0,0,0,.14);padding:6px 0;pointer-events:auto;
-}
+.box-dd,.tw-dd{display:none;position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:8px;min-width:230px;max-width:270px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.14);padding:6px 0;pointer-events:auto}
 .box-dd::before,.tw-dd::before{content:'';position:absolute;top:-10px;left:0;right:0;height:10px}
-.dance-node:hover .box-dd,.box-dd:hover,
-.dance-node.touched .box-dd{display:block}
-.tw:hover .tw-dd,.tw-dd:hover,
-.tw.touched .tw-dd{display:block}
+.dance-node:hover .box-dd,.box-dd:hover,.dance-node.touched .box-dd{display:block}
+.tw:hover .tw-dd,.tw-dd:hover,.tw.touched .tw-dd{display:block}
 .ddh{padding:5px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
 .ddr{display:flex;align-items:flex-start;gap:8px;padding:6px 12px;font-size:12px;color:var(--text);cursor:pointer;transition:background .1s}
 .ddr:hover{background:var(--bg)}
@@ -110,14 +97,8 @@ header h1 span{font-weight:300;color:var(--muted)}
 
 /* ── TRANSITION WIDGET ── */
 .tw{position:absolute;z-index:50;transform:translate(-50%,-50%);pointer-events:auto}
-.tw:hover,
-.tw.touched {z-index: 10000;}
-.tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;
-  font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;
-  gap:2px;text-align:center;min-width:100px;cursor:pointer;
-  transition:border-color .2s,box-shadow .2s,background .2s,transform .15s;
-  user-select:none;touch-action:manipulation}
+.tw:hover,.tw.touched{z-index:10000}
+.tb{background:#fff;border:2px dashed var(--g400);border-radius:8px;padding:7px 14px;font-family:var(--font);font-size:11px;font-weight:600;color:var(--g600);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:100px;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s,transform .15s;user-select:none;touch-action:manipulation}
 .tb:hover,.tw.touched .tb{border-color:var(--g600);transform:scale(1.05)}
 .tb.sel-t{border-color:var(--g600);box-shadow:0 0 0 3px rgba(46,168,96,.25)}
 .tb.glow-t{border-color:var(--amber)!important;box-shadow:0 0 0 4px rgba(230,168,23,.4)!important;background:var(--amberbg)!important}
@@ -129,12 +110,7 @@ header h1 span{font-weight:300;color:var(--muted)}
 .zbtn:hover{background:var(--bg)}
 
 /* ── OVERVIEW PANEL ── */
-.ov-panel{
-  position:fixed;top:52px;right:0;bottom:0;
-  width:min(300px,100vw);
-  background:var(--surface);border-left:1px solid var(--border);
-  display:none;flex-direction:column;z-index:400;overflow:hidden;
-}
+.ov-panel{position:fixed;top:52px;right:0;bottom:0;width:min(300px,100vw);background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:400;overflow:hidden}
 .ov-panel.open{display:flex}
 .ov-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ov-head span{font-size:13px;font-weight:600}
@@ -180,7 +156,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
   .main{height:calc(100vh - 44px)}
 }
 
-/* ── MOBILE LANDSCAPE (short viewport) ── */
+/* ── MOBILE LANDSCAPE ── */
 @media(max-height:500px){
   header{height:auto;min-height:40px;padding:4px 10px;flex-wrap:wrap;gap:4px}
   header h1{font-size:11px}
@@ -200,6 +176,7 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
     <button class="btn btn-primary" onclick="addDance()">+ Dance</button>
     <button class="btn" id="editbtn" onclick="toggleEditPanel()" title="Open/close edit panel">&#x270E; Edit</button>
     <button class="btn" onclick="toggleOv()">Overview</button>
+    <span id="sync-pill" class="hidden">☁</span>
     <input type="file" id="importInput" accept=".json,.rtf,.txt" style="display:none" onchange="importJSON(event)">
   </div>
 </header>
@@ -252,69 +229,82 @@ input:focus,textarea:focus{border-color:var(--b400);background:#fff}
 
 <script>
 
+/* ═══ SUPABASE ═══ */
 const SUPABASE_URL = "https://eipdxgzyxjbdvywfbrbz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_av0X_OjKq6mEETzc0SvfGw_f6JYfsx2";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpcGR4Z3p5eGpiZHZ5d2ZicmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NDYyNzYsImV4cCI6MjA5MjAyMjI3Nn0.v75ECXeJ3rhI7q1-y1raNjaoxaQfOPaYlW7s5f0Ybt0";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const PROJECT_ID = "dance_planner_main";
 
+/* ── Sync pill UI ── */
+let pillTimer = null;
+function showPill(state, text){
+  const el = document.getElementById('sync-pill');
+  el.className = state;
+  el.textContent = text;
+  clearTimeout(pillTimer);
+  if(state === 'ok'){
+    pillTimer = setTimeout(() => { el.className = 'hidden'; }, 2500);
+  }
+}
+
+/* ── Ensure table row exists (upsert on first load) ── */
+async function ensureRow(){
+  const { data, error } = await sb.from('dance_plans').select('id').eq('id', PROJECT_ID).maybeSingle();
+  if(!data && !error){
+    // row doesn't exist yet — insert with default state
+    await sb.from('dance_plans').insert({ id: PROJECT_ID, data: ST });
+  }
+}
+
 async function syncToSupabase(){
+  showPill('saving', '☁ saving…');
   try {
-    const { error } = await sb.from('dance_plans').upsert({
-      id: PROJECT_ID,
-      data: ST
-    }, { onConflict: 'id' });
+    const { error } = await sb.from('dance_plans').upsert({ id: PROJECT_ID, data: ST }, { onConflict: 'id' });
     if(error){
       console.error('Supabase sync error:', error.message, error.code, error.details);
-      showSyncStatus('error');
+      showPill('err', '⚠ save failed');
     } else {
-      showSyncStatus('ok');
+      showPill('ok', '☁ saved');
     }
   } catch(e){
     console.error('Supabase network error:', e);
-    showSyncStatus('error');
+    showPill('err', '⚠ offline');
   }
 }
 
-function showSyncStatus(state){
-  let el = document.getElementById('sync-status');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'sync-status';
-    el.style.cssText = 'position:fixed;bottom:60px;right:16px;font-size:10px;padding:4px 10px;border-radius:12px;z-index:9999;pointer-events:none;transition:opacity 1s;font-family:monospace';
-    document.body.appendChild(el);
-  }
-  if(state === 'ok'){
-    el.textContent = '☁ saved';
-    el.style.background = '#d4edda';
-    el.style.color = '#155724';
-    el.style.opacity = '1';
-    setTimeout(()=>{ el.style.opacity='0'; }, 2000);
-  } else {
-    el.textContent = '⚠ cloud save failed — check console';
-    el.style.background = '#f8d7da';
-    el.style.color = '#721c24';
-    el.style.opacity = '1';
-  }
-}
+let syncTimeout = null;
+let isSelfSave = false; // prevents realtime echo
 
-let syncTimeout;
 function queueSync(){
-  // Always keep local backup instantly
   localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
-  // Debounce cloud sync to 800ms — but also flush on page hide
+  showPill('saving', '☁ saving…');
   clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(syncToSupabase, 800);
+  syncTimeout = setTimeout(async () => {
+    isSelfSave = true;
+    await syncToSupabase();
+    // keep isSelfSave true briefly so realtime echo is ignored
+    setTimeout(() => { isSelfSave = false; }, 1500);
+    syncTimeout = null;
+  }, 800);
 }
-// Flush to cloud immediately if user closes/hides tab
+
+// Flush immediately on tab hide/close
 document.addEventListener('visibilitychange', () => {
-  if(document.visibilityState === 'hidden') syncToSupabase();
+  if(document.visibilityState === 'hidden'){
+    clearTimeout(syncTimeout);
+    syncTimeout = null;
+    syncToSupabase();
+  }
 });
-window.addEventListener('pagehide', () => syncToSupabase());
+window.addEventListener('pagehide', () => {
+  clearTimeout(syncTimeout);
+  syncToSupabase();
+});
 
 /* ═══ CONSTANTS & STATE ═══ */
 const BW=230, BH=130;
-const DEFAULT_ST = {"dances":[{"id":"d1","title":"ВИДЕО ПОГРЕБЕНИЕ","dur":"0:30","dancers":"","props":"","notes":"","x":101,"y":48},{"id":"d2","title":"1. УЛАЛА","dur":"5:00","dancers":"Ян, Петра, Светльо, Бети, Тейси, Климент, Катя, Настя, Кирил, Марианна, Софи, Бобо, Колцата, Лили, Саши, Йоли, Мишето, Вики, ","props":"","notes":"4:00 танц + 1:00 монолог","x":617,"y":45},{"id":"d3","title":"2. СЕАНС","dur":"2:53","dancers":"Петра, Марианна, Софи, Катя","props":"","notes":"накрая се появява духът","x":1076.3266925569042,"y":0},{"id":"d4","title":"3. СОЛО ДУХ","dur":"3:40","dancers":"Бети","props":"","notes":"","x":1444,"y":41},{"id":"d5","title":"4. ПЛЕМЕННИК танц","dur":"5:00","dancers":"Мишо, Ян, Климент, Колцата, Кирил, Бобо","props":"столове, бар, 1 маса","notes":"","x":1525,"y":281},{"id":"d7","title":"5. СЕМЕЙСТВО и ПИКОЛО","dur":"3:00","dancers":"Светльо, Петра, Кирил, Катя, Ян","props":"","notes":"","x":1091,"y":286},{"id":"d9","title":"6. Адиос","dur":"2:55","dancers":"Петра, Светльо","props":"обстановка-бар , 2 маси , обстановка рецепция","notes":"","x":603.8173420687783,"y":357.2188989845903},{"id":"d11","title":"7. ГОТВАЧИ","dur":"2:45","dancers":"Кирил, Светльо, Катя, Ян, Бобо, Климент, Мишо, Васко, Тейси, Марианна, Лили, Саши, Колцата, Мишето, Йоли, Вики, Настя, ","props":"5 маси , обстановка кухня , 5 точилки, 5 купи, 5 солници, 5 ножове, 5 бъркалки, магнезий, 4 табли, 5 покривки ","notes":"","x":99.03750113830048,"y":212.61294968795593},{"id":"d13","title":"8. Соло КАМЕРИЕРКА","dur":"4:30","dancers":"","props":"риза, сако, кърпичка ","notes":"","x":102.97889139012017,"y":759.5596316829036},{"id":"d15","title":"9. LOVEFOOL","dur":"3:13","dancers":"Ян ,Колцата ,Климент, Васко, Бобо, Настя, Йоли, Марианна, Тейси, Софи","props":"обстановка стая","notes":"","x":527.7320004485277,"y":565.590368512504},{"id":"d17","title":"10. СЕСТРА","dur":"4:30","dancers":"Вики, Катя,Тейси,Петра,","props":"","notes":"","x":946.3993884343835,"y":566.2970070121044},{"id":"d19","title":"11. КАМЕРИЕРКИ ","dur":"3:40","dancers":"Марианна,Тейси,Софи,Петра,Саши,Лили,Йоли,Мишето,Катя,Настя","props":"обстановка пентхаус , рокли,халати,бърсалки ,парцалчета,бои,тоалетка,шендери,куфар,шапки,пера","notes":"","x":1421.534089916152,"y":560.7077913865771},{"id":"d21","title":"12. ДУЕТ СЕСТРИ","dur":"3:00","dancers":"Бети,Вики","props":"","notes":"","x":1423.3777605293633,"y":876.0439790647016},{"id":"d23","title":"13. МИРОРС","dur":"3:10","dancers":"Васко,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Мишето,Лили,Саши,Климент,Кирил,Тейси,Светльо","props":"4 платна, обастановка ателие","notes":"","x":971.5777467205259,"y":806.9731017492177},{"id":"d25","title":"14. ХУДОЖНИК","dur":"5:00","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо","props":"","notes":"","x":555.0924161843485,"y":831.1646070734932},{"id":"d27","title":"15. Дует ПИКОЛО и ДУХ","dur":"2:30","dancers":"Ян,Бети","props":"","notes":"смяна обстановка в края на дуета, да са на втора сцена и да се озоват пред стая 13 ","x":135.77188361331622,"y":988.6918118907464},{"id":"d29","title":"16. СТАЯ 13 ","dur":"3:15","dancers":"Климент,Тейси,Кирил,Мишо,Светльо.Колцата,Настя,Мишето","props":"обстановка стая 13 ","notes":"","x":130.26898948508745,"y":1273.1889177625178},{"id":"d31","title":"17. ХОТЕЛ 2","dur":"2:30","dancers":"","props":"","notes":"","x":506.6669478559353,"y":1163.6788040531092},{"id":"d33","title":"18. ТРИО","dur":"2:30","dancers":"Петра,Бобо,Колцата","props":"стълба,моп,","notes":"обстановка рецепция","x":920.4845862987387,"y":1142.2149963953605},{"id":"d35","title":"19. АДВОКАТИ ","dur":"2:30","dancers":"","props":"5 маси","notes":"","x":1347.9125067545476,"y":1060.6226894323522},{"id":"d37","title":"20. Тайни Кроежи и отказ от завещанието","dur":"3:00","dancers":"","props":"","notes":"","x":1551.1162533937556,"y":1301.7938849986829},{"id":"d39","title":"21. КАЛАШНИКОВ","dur":"2:30","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо,Ян","props":"обстановка вечеря","notes":"","x":1125.934530473612,"y":1473.274795717161},{"id":"d41","title":"22. ДУХ ОБЩО","dur":"2:00","dancers":"Петра,Бети,Ян,Светльо,Васко,Вики,Мишо,Катя,Кирил","props":"","notes":"","x":823.7945452117186,"y":1467.4854479297412},{"id":"d43","title":"23. ПОКЛОН","dur":"4:00","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо,Ян","props":"","notes":"","x":346.3812980281992,"y":1578.911801031954}],"transitions":[{"id":"t1","from":"d1","to":"d2","name":"ПИКОЛО ЧЕТЕ ПИСМО НА СЦЕНА","dur":"0:20","dancers":"Ян","props":"","notes":""},{"id":"t2","from":"d2","to":"d3","name":"ПРЕХОД СЕАНС + племенник","dur":"0:20","dancers":"","props":"Изнасяне на реквизит","notes":""},{"id":"t3","from":"d3","to":"d4","name":"няма","dur":"","dancers":"","props":"","notes":""},{"id":"t6","from":"d4","to":"d5","name":"КАМЕРИЕРКИ","dur":"1:00","dancers":"Софи, Марианна, Ян","props":"","notes":""},{"id":"t8","from":"d5","to":"d7","name":"СЕМЕЙСТВО пристига","dur":"0:40","dancers":"Светльо, Петра, Кирил, Катя, Ян","props":"","notes":""},{"id":"t10","from":"d7","to":"d9","name":"","dur":"","dancers":"","props":"","notes":""},{"id":"t12","from":"d9","to":"d11","name":"децата и пиколо към кухня ","dur":"0:25","dancers":"Ян, Кирил, Катя ","props":"5 Маси","notes":"смяна обстановка"},{"id":"t14","from":"d11","to":"d13","name":"КЪМ СТАЯ ПИКОЛО","dur":"0:20","dancers":"","props":"легло щендер сако риза обастановка стая пиколо","notes":"смяна обстановка"},{"id":"t16","from":"d13","to":"d15","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t18","from":"d15","to":"d17","name":"преход ПЕНТХАУС","dur":"0:20","dancers":"Ян","props":"смяна обстановка на пентхаус ","notes":""},{"id":"t20","from":"d17","to":"d19","name":"СЕСТРА и ПЛЕМЕННИК","dur":"0:30","dancers":"Мишо, Вики ","props":"","notes":"показваме връзка"},{"id":"t22","from":"d19","to":"d21","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t24","from":"d21","to":"d23","name":"пиколо соло ,Стая 13 и Тейси","dur":"1:00","dancers":"Ян, Тейси ","props":"смяна обстановка от пентхаус към ателие художник","notes":""},{"id":"t26","from":"d23","to":"d25","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t28","from":"d25","to":"d27","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t30","from":"d27","to":"d29","name":"","dur":"","dancers":"","props":"","notes":""},{"id":"t32","from":"d29","to":"d31","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t34","from":"d31","to":"d33","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t36","from":"d33","to":"d35","name":"ТРЯБВА НИ ТРАНЗИШЪН","dur":"","dancers":"","props":"","notes":""},{"id":"t38","from":"d35","to":"d37","name":"Завещание Саша","dur":"1:00","dancers":"","props":"","notes":""},{"id":"t40","from":"d37","to":"d39","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t42","from":"d39","to":"d41","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t44","from":"d41","to":"d43","name":"погребение-видео","dur":"0:20","dancers":"","props":"","notes":""}]};
+const DEFAULT_ST = {"dances":[{"id":"d1","title":"ВИДЕО ПОГРЕБЕНИЕ","dur":"0:30","dancers":"","props":"","notes":"","x":101,"y":48},{"id":"d2","title":"1. УЛАЛА","dur":"5:00","dancers":"Ян, Петра, Светльо, Бети, Тейси, Климент, Катя, Настя, Кирил, Марианна, Софи, Бобо, Колцата, Лили, Саши, Йоли, Мишето, Вики, ","props":"","notes":"4:00 танц + 1:00 монолог","x":617,"y":45},{"id":"d3","title":"2. СЕАНС","dur":"2:53","dancers":"Петра, Марианна, Софи, Катя","props":"","notes":"накрая се появява духът","x":1076,"y":0},{"id":"d4","title":"3. СОЛО ДУХ","dur":"3:40","dancers":"Бети","props":"","notes":"","x":1444,"y":41},{"id":"d5","title":"4. ПЛЕМЕННИК танц","dur":"5:00","dancers":"Мишо, Ян, Климент, Колцата, Кирил, Бобо","props":"столове, бар, 1 маса","notes":"","x":1525,"y":281},{"id":"d7","title":"5. СЕМЕЙСТВО и ПИКОЛО","dur":"3:00","dancers":"Светльо, Петра, Кирил, Катя, Ян","props":"","notes":"","x":1091,"y":286},{"id":"d9","title":"6. Адиос","dur":"2:55","dancers":"Петра, Светльо","props":"обстановка-бар , 2 маси , обстановка рецепция","notes":"","x":604,"y":357},{"id":"d11","title":"7. ГОТВАЧИ","dur":"2:45","dancers":"Кирил, Светльо, Катя, Ян, Бобо, Климент, Мишо, Васко, Тейси, Марианна, Лили, Саши, Колцата, Мишето, Йоли, Вики, Настя, ","props":"5 маси , обстановка кухня , 5 точилки, 5 купи, 5 солници, 5 ножове, 5 бъркалки, магнезий, 4 табли, 5 покривки ","notes":"","x":99,"y":212},{"id":"d13","title":"8. Соло КАМЕРИЕРКА","dur":"4:30","dancers":"","props":"риза, сако, кърпичка ","notes":"","x":103,"y":759},{"id":"d15","title":"9. LOVEFOOL","dur":"3:13","dancers":"Ян ,Колцата ,Климент, Васко, Бобо, Настя, Йоли, Марианна, Тейси, Софи","props":"обстановка стая","notes":"","x":528,"y":565},{"id":"d17","title":"10. СЕСТРА","dur":"4:30","dancers":"Вики, Катя,Тейси,Петра,","props":"","notes":"","x":946,"y":566},{"id":"d19","title":"11. КАМЕРИЕРКИ ","dur":"3:40","dancers":"Марианна,Тейси,Софи,Петра,Саши,Лили,Йоли,Мишето,Катя,Настя","props":"обстановка пентхаус , рокли,халати,бърсалки ,парцалчета,бои,тоалетка,шендери,куфар,шапки,пера","notes":"","x":1421,"y":560},{"id":"d21","title":"12. ДУЕТ СЕСТРИ","dur":"3:00","dancers":"Бети,Вики","props":"","notes":"","x":1423,"y":876},{"id":"d23","title":"13. МИРОРС","dur":"3:10","dancers":"Васко,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Мишето,Лили,Саши,Климент,Кирил,Тейси,Светльо","props":"4 платна, обастановка ателие","notes":"","x":971,"y":806},{"id":"d25","title":"14. ХУДОЖНИК","dur":"5:00","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо","props":"","notes":"","x":555,"y":831},{"id":"d27","title":"15. Дует ПИКОЛО и ДУХ","dur":"2:30","dancers":"Ян,Бети","props":"","notes":"смяна обстановка в края на дуета, да са на втора сцена и да се озоват пред стая 13 ","x":136,"y":988},{"id":"d29","title":"16. СТАЙ 13 ","dur":"3:15","dancers":"Климент,Тейси,Кирил,Мишо,Светльо.Колцата,Настя,Мишето","props":"обстановка стая 13 ","notes":"","x":130,"y":1273},{"id":"d31","title":"17. ХОТЕЛ 2","dur":"2:30","dancers":"","props":"","notes":"","x":507,"y":1163},{"id":"d33","title":"18. ТРИО","dur":"2:30","dancers":"Петра,Бобо,Колцата","props":"стълба,моп,","notes":"обстановка рецепция","x":920,"y":1142},{"id":"d35","title":"19. АДВОКАТИ ","dur":"2:30","dancers":"","props":"5 маси","notes":"","x":1348,"y":1060},{"id":"d37","title":"20. Тайни Кроежи и отказ от завещанието","dur":"3:00","dancers":"","props":"","notes":"","x":1551,"y":1301},{"id":"d39","title":"21. КАЛАШНИКОВ","dur":"2:30","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо,Ян","props":"обстановка вечеря","notes":"","x":1126,"y":1473},{"id":"d41","title":"22. ДУХ ОБЩО","dur":"2:00","dancers":"Петра,Бети,Ян,Светльо,Васко,Вики,Мишо,Катя,Кирил","props":"","notes":"","x":824,"y":1467},{"id":"d43","title":"23. ПОКЛОН","dur":"4:00","dancers":"Мишето,Лили,СВаско,Бети,Марианна,Петра,Вики,Софи,Бобо,Катя,Настя,Колцата,Мишо,Йоли,Маши,Климент,Кирил,Тейси,Светльо,Ян","props":"","notes":"","x":346,"y":1578}],"transitions":[{"id":"t1","from":"d1","to":"d2","name":"ПИКОЛО ЧЕТЕ ПИСМО НА СЦЕНА","dur":"0:20","dancers":"Ян","props":"","notes":""},{"id":"t2","from":"d2","to":"d3","name":"ПРЕХОД СЕАНС + племенник","dur":"0:20","dancers":"","props":"Изнасяне на реквизит","notes":""},{"id":"t3","from":"d3","to":"d4","name":"няма","dur":"","dancers":"","props":"","notes":""},{"id":"t6","from":"d4","to":"d5","name":"КАМЕРИЕРКИ","dur":"1:00","dancers":"Софи, Марианна, Ян","props":"","notes":""},{"id":"t8","from":"d5","to":"d7","name":"СЕМЕЙСТВО пристига","dur":"0:40","dancers":"Светльо, Петра, Кирил, Катя, Ян","props":"","notes":""},{"id":"t10","from":"d7","to":"d9","name":"","dur":"","dancers":"","props":"","notes":""},{"id":"t12","from":"d9","to":"d11","name":"децата и пиколо към кухня ","dur":"0:25","dancers":"Ян, Кирил, Катя ","props":"5 Маси","notes":"смяна обстановка"},{"id":"t14","from":"d11","to":"d13","name":"КЪМ СТАЯ ПИКОЛО","dur":"0:20","dancers":"","props":"легло щендер сако риза обастановка стая пиколо","notes":"смяна обстановка"},{"id":"t16","from":"d13","to":"d15","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t18","from":"d15","to":"d17","name":"преход ПЕНТХАУС","dur":"0:20","dancers":"Ян","props":"смяна обстановка на пентхаус ","notes":""},{"id":"t20","from":"d17","to":"d19","name":"СЕСТРА и ПЛЕМЕННИК","dur":"0:30","dancers":"Мишо, Вики ","props":"","notes":"показваме връзка"},{"id":"t22","from":"d19","to":"d21","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t24","from":"d21","to":"d23","name":"пиколо соло ,Стая 13 и Тейси","dur":"1:00","dancers":"Ян, Тейси ","props":"смяна обстановка от пентхаус към ателие художник","notes":""},{"id":"t26","from":"d23","to":"d25","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t28","from":"d25","to":"d27","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t30","from":"d27","to":"d29","name":"","dur":"","dancers":"","props":"","notes":""},{"id":"t32","from":"d29","to":"d31","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t34","from":"d31","to":"d33","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t36","from":"d33","to":"d35","name":"ТРЯБВА НИ ТРАНЗИШЪН","dur":"","dancers":"","props":"","notes":""},{"id":"t38","from":"d35","to":"d37","name":"Завещание Саша","dur":"1:00","dancers":"","props":"","notes":""},{"id":"t40","from":"d37","to":"d39","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t42","from":"d39","to":"d41","name":"Transition","dur":"","dancers":"","props":"","notes":""},{"id":"t44","from":"d41","to":"d43","name":"погребение-видео","dur":"0:20","dancers":"","props":"","notes":""}]};
 let ST = JSON.parse(JSON.stringify(DEFAULT_ST));
 let nid=50, sel=null, sc=1, px=0, py=0;
 let panning=false, ps=null;
@@ -350,39 +340,24 @@ function clearHL(){
   });
   document.querySelectorAll('.tb').forEach(t=>t.classList.remove('glow-t'));
 }
-
 function applyHL(ids){
   document.querySelectorAll('.dance-node').forEach(n=>{
     const b=n.querySelector('.dance-box');
-    if(ids.has(n.dataset.id)){
-      n.classList.remove('dim');
-      if(b)b.classList.add('glow');
-    }else{
-      n.classList.add('dim');
-      if(b)b.classList.remove('glow');
-    }
+    if(ids.has(n.dataset.id)){n.classList.remove('dim');if(b)b.classList.add('glow');}
+    else{n.classList.add('dim');if(b)b.classList.remove('glow');}
   });
   document.querySelectorAll('.tb').forEach(t=>{
     if(ids.has(t.dataset.id))t.classList.add('glow-t');
     else t.classList.remove('glow-t');
   });
 }
-
-function hld(name, on){
-  if(!on||!name){clearHL();return}
-  applyHL(new Set(wid(name).map(l=>l.id)));
-}
-function hlp(name, on){
-  if(!on||!name){clearHL();return}
-  applyHL(new Set(wip(name).map(l=>l.id)));
-}
-
+function hld(name,on){if(!on||!name){clearHL();return}applyHL(new Set(wid(name).map(l=>l.id)))}
+function hlp(name,on){if(!on||!name){clearHL();return}applyHL(new Set(wip(name).map(l=>l.id)))}
 let activeHl=null;
 function toggleHld(name,type,e){
   e.stopPropagation();
   if(activeHl===name){clearHL();activeHl=null;return}
-  clearHL();activeHl=name;
-  closeEdit();
+  clearHL();activeHl=name;closeEdit();
   const ids=new Set((type==='d'?wid(name):wip(name)).map(l=>l.id));
   applyHL(ids);
 }
@@ -394,24 +369,16 @@ function ddRows(dancers,props,dl){
     h+=`<div class="ddh">${dl?'Dancers':'Dancer movements'}</div>`;
     dancers.forEach(n=>{
       const safe=n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      const locs=wid(n).map(l=>l.label).join(' \u00b7 ');
-      h+=`<div class="ddr"
-        onmouseenter="hld('${safe}',true)"
-        onmouseleave="hld(null,false)"
-        ontouchstart="toggleHld('${safe}','d',event)"
-      ><span class="ddot ddot-b"></span><span class="ddn">${esc(n)}</span><span class="ddw">${esc(locs)}</span></div>`;
+      const locs=wid(n).map(l=>l.label).join(' · ');
+      h+=`<div class="ddr" onmouseenter="hld('${safe}',true)" onmouseleave="hld(null,false)" ontouchstart="toggleHld('${safe}','d',event)"><span class="ddot ddot-b"></span><span class="ddn">${esc(n)}</span><span class="ddw">${esc(locs)}</span></div>`;
     });
   }
   if(props.length){
     h+=`<div class="ddh" style="margin-top:4px">Props</div>`;
     props.forEach(p=>{
       const safe=p.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      const locs=wip(p).map(l=>l.label).join(' \u00b7 ');
-      h+=`<div class="ddr"
-        onmouseenter="hlp('${safe}',true)"
-        onmouseleave="hlp(null,false)"
-        ontouchstart="toggleHld('${safe}','p',event)"
-      ><span class="ddot ddot-a"></span><span class="ddn">${esc(p)}</span><span class="ddw">${esc(locs)}</span></div>`;
+      const locs=wip(p).map(l=>l.label).join(' · ');
+      h+=`<div class="ddr" onmouseenter="hlp('${safe}',true)" onmouseleave="hlp(null,false)" ontouchstart="toggleHld('${safe}','p',event)"><span class="ddot ddot-a"></span><span class="ddn">${esc(p)}</span><span class="ddw">${esc(locs)}</span></div>`;
     });
   }
   if(!dancers.length&&!props.length)h+='<div class="dde">Nothing assigned yet</div>';
@@ -419,42 +386,26 @@ function ddRows(dancers,props,dl){
 }
 
 /* ═══ BEZIER ═══ */
-function getAnchorPoints(A, B) {
-  const axc = A.x + BW / 2;
-  const ayc = A.y + BH / 2;
-  const bxc = B.x + BW / 2;
-  const byc = B.y + BH / 2;
-  const dx = bxc - axc;
-  const dy = byc - ayc;
-  const H_THRESHOLD = 120;
-  let ax, ay, bx, by;
-  if (Math.abs(dx) > Math.abs(dy) + H_THRESHOLD) {
-    if (dx > 0) {
-      ax = A.x + BW; ay = ayc;
-      bx = B.x;      by = byc;
-    } else {
-      ax = A.x;      ay = ayc;
-      bx = B.x + BW; by = byc;
-    }
-  } else {
-    if (dy > 0) {
-      ax = axc; ay = A.y + BH;
-      bx = bxc; by = B.y;
-    } else {
-      ax = axc; ay = A.y;
-      bx = bxc; by = B.y + BH;
-    }
+function getAnchorPoints(A,B){
+  const axc=A.x+BW/2,ayc=A.y+BH/2,bxc=B.x+BW/2,byc=B.y+BH/2;
+  const dx=bxc-axc,dy=byc-ayc,H=120;
+  let ax,ay,bx,by;
+  if(Math.abs(dx)>Math.abs(dy)+H){
+    if(dx>0){ax=A.x+BW;ay=ayc;bx=B.x;by=byc;}
+    else{ax=A.x;ay=ayc;bx=B.x+BW;by=byc;}
+  }else{
+    if(dy>0){ax=axc;ay=A.y+BH;bx=bxc;by=B.y;}
+    else{ax=axc;ay=A.y;bx=bxc;by=B.y+BH;}
   }
-  return { ax, ay, bx, by };
+  return{ax,ay,bx,by};
 }
 function getBezier(A,B){
-  const { ax, ay, bx, by } = getAnchorPoints(A, B);
-  const gap = Math.max(120, Math.abs(by - ay));
-  const cp1x=ax, cp1y=ay+gap*0.45;
-  const cp2x=bx, cp2y=by-gap*0.45;
+  const{ax,ay,bx,by}=getAnchorPoints(A,B);
+  const gap=Math.max(120,Math.abs(by-ay));
+  const cp1x=ax,cp1y=ay+gap*0.45,cp2x=bx,cp2y=by-gap*0.45;
   const mx=0.125*ax+0.375*cp1x+0.375*cp2x+0.125*bx;
   const my=0.125*ay+0.375*cp1y+0.375*cp2y+0.125*by;
-  return {ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y,mx,my};
+  return{ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y,mx,my};
 }
 
 /* ═══ SVG LINES ═══ */
@@ -462,28 +413,23 @@ function drawLines(){
   const svg=document.getElementById('svgl');
   [...svg.children].forEach(c=>{if(c.tagName!=='defs')c.remove()});
   ST.transitions.forEach(t=>{
-    const A=ST.dances.find(d=>d.id===t.from);
-    const B=ST.dances.find(d=>d.id===t.to);
+    const A=ST.dances.find(d=>d.id===t.from),B=ST.dances.find(d=>d.id===t.to);
     if(!A||!B)return;
-    const {ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y}=getBezier(A,B);
+    const{ax,ay,bx,by,cp1x,cp1y,cp2x,cp2y}=getBezier(A,B);
     const pd=`M${ax},${ay} C${cp1x},${cp1y} ${cp2x},${cp2y} ${bx},${by}`;
-
     const glow=document.createElementNS('http://www.w3.org/2000/svg','path');
     glow.setAttribute('d',pd);glow.setAttribute('fill','none');
     glow.setAttribute('stroke','rgba(74,130,212,0.13)');glow.setAttribute('stroke-width','9');
     glow.setAttribute('stroke-linecap','round');svg.appendChild(glow);
-
     const line=document.createElementNS('http://www.w3.org/2000/svg','path');
     line.setAttribute('d',pd);line.setAttribute('fill','none');
     line.setAttribute('stroke','#4a82d4');line.setAttribute('stroke-width','2');
     line.setAttribute('stroke-dasharray','6 4');line.setAttribute('stroke-linecap','round');
     line.setAttribute('marker-end','url(#marr)');line.setAttribute('opacity','0.75');
     const anim=document.createElementNS('http://www.w3.org/2000/svg','animate');
-    anim.setAttribute('attributeName','stroke-dashoffset');
-    anim.setAttribute('from','0');anim.setAttribute('to','-20');
+    anim.setAttribute('attributeName','stroke-dashoffset');anim.setAttribute('from','0');anim.setAttribute('to','-20');
     anim.setAttribute('dur','1.4s');anim.setAttribute('repeatCount','indefinite');
     line.appendChild(anim);svg.appendChild(line);
-
     [[ax,ay,'#c5d9f5'],[bx,by,'#4a82d4']].forEach(([cx,cy,col])=>{
       const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
       c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','4.5');
@@ -498,29 +444,19 @@ function render(){
   const canvas=document.getElementById('canvas');
   canvas.querySelectorAll('.dance-node,.tw').forEach(e=>e.remove());
   drawLines();
-
   ST.transitions.forEach(t=>{
-    const A=ST.dances.find(d=>d.id===t.from);
-    const B=ST.dances.find(d=>d.id===t.to);
+    const A=ST.dances.find(d=>d.id===t.from),B=ST.dances.find(d=>d.id===t.to);
     if(!A||!B)return;
-    const {mx,my}=getBezier(A,B);
-
+    const{mx,my}=getBezier(A,B);
     const wrap=document.createElement('div');
-    wrap.className='tw';
-    wrap.dataset.id=t.id;
-    wrap.style.left=mx+'px';
-    wrap.style.top=my+'px';
-
+    wrap.className='tw';wrap.dataset.id=t.id;
+    wrap.style.left=mx+'px';wrap.style.top=my+'px';
     const box=document.createElement('div');
-    box.className='tb'+(sel===t.id?' sel-t':'');
-    box.dataset.id=t.id;
+    box.className='tb'+(sel===t.id?' sel-t':'');box.dataset.id=t.id;
     box.innerHTML=`<span>${esc(t.name||'Transition')}</span><span class="tdur">${esc(t.dur||'—')}</span>`;
     box.onclick=e=>{e.stopPropagation();selNode(t.id,'trans')};
-
     const dd=document.createElement('div');
-    dd.className='tw-dd';
-    dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
-
+    dd.className='tw-dd';dd.innerHTML=ddRows(gd(t.dancers||''),gp(t.props||''),false);
     wrap.appendChild(box);wrap.appendChild(dd);
     wrap.addEventListener('mouseenter',()=>dd.style.display='block');
     wrap.addEventListener('mouseleave',()=>dd.style.display='none');
@@ -531,7 +467,6 @@ function render(){
       if(!already)wrap.classList.add('touched');
       else{clearHL();activeHl=null;selNode(t.id,'trans')}
     },{passive:true});
-
     canvas.appendChild(wrap);
   });
 
@@ -539,11 +474,9 @@ function render(){
     const el=document.createElement('div');
     el.className='dance-node';el.dataset.id=d.id;
     el.style.cssText=`left:${d.x}px;top:${d.y}px;width:${BW}px`;
-
     const dtags=gd(d.dancers).map(n=>`<span class="tag tag-d">${esc(n)}</span>`).join('');
     const ptags=gp(d.props).map(p=>`<span class="tag tag-p">${esc(p)}</span>`).join('');
     const notes=d.notes?`<div class="dnotes">${esc(d.notes)}</div>`:'';
-
     el.innerHTML=`
       <div class="dance-box${sel===d.id?' sel':''}">
         <div class="dnum">Dance ${i+1}</div>
@@ -556,26 +489,19 @@ function render(){
         ${notes}
         <div class="box-dd">${ddRows(gd(d.dancers),gp(d.props),true)}</div>
       </div>`;
-
     el.querySelector('.dance-box').addEventListener('click',e=>{
-      e.stopPropagation();
-      clearHL();activeHl=null;
-      selNode(d.id,'dance');
+      e.stopPropagation();clearHL();activeHl=null;selNode(d.id,'dance');
     });
     el.addEventListener('mousedown',e=>startDrag(e,d.id));
-
     let holdTimer=null,isTouchDrag=false,tSX=0,tSY=0,tId=null;
     el.addEventListener('touchstart',e=>{
       if(e.touches.length!==1)return;
-      const tc=e.touches[0];
-      tId=tc.identifier;tSX=tc.clientX;tSY=tc.clientY;isTouchDrag=false;
+      const tc=e.touches[0];tId=tc.identifier;tSX=tc.clientX;tSY=tc.clientY;isTouchDrag=false;
       holdTimer=setTimeout(()=>{
         isTouchDrag=true;
         document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
         const wr=document.getElementById('cwrap').getBoundingClientRect();
-        doff.x=(tSX-wr.left-px)/sc-d.x;
-        doff.y=(tSY-wr.top-py)/sc-d.y;
-        dragging=d.id;
+        doff.x=(tSX-wr.left-px)/sc-d.x;doff.y=(tSY-wr.top-py)/sc-d.y;dragging=d.id;
       },280);
     },{passive:true});
     el.addEventListener('touchmove',e=>{
@@ -599,55 +525,31 @@ function render(){
       if(!already)el.classList.add('touched');
       else selNode(d.id,'dance');
     },{passive:true});
-
     canvas.appendChild(el);
   });
 }
 
 /* ═══ EDIT SIDEBAR ═══ */
-let editPanelOpen = false;
-
-function openEdit(){
-  editPanelOpen = true;
-  document.getElementById('editsb').classList.add('open');
-  document.getElementById('editbtn').classList.add('btn-active');
-}
-function closeEdit(){
-  editPanelOpen = false;
-  document.getElementById('editsb').classList.remove('open');
-  document.getElementById('editbtn').classList.remove('btn-active');
-}
-
+let editPanelOpen=false;
+function openEdit(){editPanelOpen=true;document.getElementById('editsb').classList.add('open');document.getElementById('editbtn').classList.add('btn-active')}
+function closeEdit(){editPanelOpen=false;document.getElementById('editsb').classList.remove('open');document.getElementById('editbtn').classList.remove('btn-active')}
 function toggleEditPanel(){
-  if(editPanelOpen){
-    closeEdit();
-  } else {
+  if(editPanelOpen){closeEdit();}
+  else{
     openEdit();
     if(sel){
-      const d=ST.dances.find(x=>x.id===sel);
-      const t=ST.transitions.find(x=>x.id===sel);
-      if(d) renderEdit(sel,'dance');
-      else if(t) renderEdit(sel,'trans');
-    } else {
+      const d=ST.dances.find(x=>x.id===sel),t=ST.transitions.find(x=>x.id===sel);
+      if(d)renderEdit(sel,'dance');else if(t)renderEdit(sel,'trans');
+    }else{
       document.getElementById('editsb-title').textContent='Edit';
       document.getElementById('editsb-body').innerHTML='<div class="no-sel">Select a dance box or transition on the canvas, then use this panel to edit it.</div>';
     }
   }
 }
-
-function selNode(id,type){
-  clearHL();activeHl=null;
-  sel=id;
-  if(editPanelOpen){
-    renderEdit(id,type);
-  }
-  render();
-}
-
+function selNode(id,type){clearHL();activeHl=null;sel=id;if(editPanelOpen)renderEdit(id,type);render()}
 function renderEdit(id,type){
-  const title=document.getElementById('editsb-title');
-  const body=document.getElementById('editsb-body');
-  if(!id){return}
+  const title=document.getElementById('editsb-title'),body=document.getElementById('editsb-body');
+  if(!id)return;
   if(type==='dance'){
     const d=ST.dances.find(x=>x.id===id),i=ST.dances.indexOf(d);
     title.textContent=`Dance ${i+1}`;
@@ -657,22 +559,10 @@ function renderEdit(id,type){
           <div class="bnum">${i+1}</div>
           <input class="edit-title-inp" value="${esc(d.title)}" oninput="ud('${id}','title',this.value)">
         </div>
-        <div class="field-row">
-          <div class="field-label">Duration</div>
-          <input type="text" value="${esc(d.dur)}" oninput="ud('${id}','dur',this.value)" placeholder="e.g. 3:30">
-        </div>
-        <div class="field-row">
-          <div class="field-label">Dancers (comma separated)</div>
-          <textarea rows="2" oninput="ud('${id}','dancers',this.value)">${esc(d.dancers)}</textarea>
-        </div>
-        <div class="field-row">
-          <div class="field-label">Props</div>
-          <textarea rows="2" oninput="ud('${id}','props',this.value)">${esc(d.props)}</textarea>
-        </div>
-        <div class="field-row">
-          <div class="field-label">Notes / cues</div>
-          <textarea rows="2" oninput="ud('${id}','notes',this.value)">${esc(d.notes)}</textarea>
-        </div>
+        <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(d.dur)}" oninput="ud('${id}','dur',this.value)" placeholder="e.g. 3:30"></div>
+        <div class="field-row"><div class="field-label">Dancers (comma separated)</div><textarea rows="2" oninput="ud('${id}','dancers',this.value)">${esc(d.dancers)}</textarea></div>
+        <div class="field-row"><div class="field-label">Props</div><textarea rows="2" oninput="ud('${id}','props',this.value)">${esc(d.props)}</textarea></div>
+        <div class="field-row"><div class="field-label">Notes / cues</div><textarea rows="2" oninput="ud('${id}','notes',this.value)">${esc(d.notes)}</textarea></div>
         <button class="btn" style="color:#900;border-color:#e0a0a0;margin-top:6px" onclick="rmDance('${id}')">Remove this dance</button>
       </div>`;
   }else{
@@ -686,50 +576,29 @@ function renderEdit(id,type){
           <input class="edit-title-inp" style="color:#1a6640" value="${esc(t.name)}" oninput="ut('${t.id}','name',this.value)" placeholder="Transition name&hellip;">
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:4px">${esc(A?.title||'')} &rarr; ${esc(B?.title||'')}</div>
-        <div class="field-row">
-          <div class="field-label">Duration</div>
-          <input type="text" value="${esc(t.dur)}" oninput="ut('${t.id}','dur',this.value)" placeholder="e.g. 1:00">
-        </div>
-        <div class="field-row">
-          <div class="field-label">Dancer movements</div>
-          <textarea rows="2" oninput="ut('${t.id}','dancers',this.value)">${esc(t.dancers)}</textarea>
-        </div>
-        <div class="field-row">
-          <div class="field-label">Prop changes</div>
-          <textarea rows="2" oninput="ut('${t.id}','props',this.value)">${esc(t.props)}</textarea>
-        </div>
-        <div class="field-row">
-          <div class="field-label">Notes</div>
-          <textarea rows="2" oninput="ut('${t.id}','notes',this.value)">${esc(t.notes)}</textarea>
-        </div>
+        <div class="field-row"><div class="field-label">Duration</div><input type="text" value="${esc(t.dur)}" oninput="ut('${t.id}','dur',this.value)" placeholder="e.g. 1:00"></div>
+        <div class="field-row"><div class="field-label">Dancer movements</div><textarea rows="2" oninput="ut('${t.id}','dancers',this.value)">${esc(t.dancers)}</textarea></div>
+        <div class="field-row"><div class="field-label">Prop changes</div><textarea rows="2" oninput="ut('${t.id}','props',this.value)">${esc(t.props)}</textarea></div>
+        <div class="field-row"><div class="field-label">Notes</div><textarea rows="2" oninput="ut('${t.id}','notes',this.value)">${esc(t.notes)}</textarea></div>
       </div>`;
   }
 }
 
 /* ═══ DESKTOP DRAG ═══ */
 function startDrag(e,id){
-  if(e.button!==0)return;
-  dragging=id;
+  if(e.button!==0)return;dragging=id;
   const d=ST.dances.find(x=>x.id===id);
   const wr=document.getElementById('cwrap').getBoundingClientRect();
-  doff.x=(e.clientX-wr.left-px)/sc-d.x;
-  doff.y=(e.clientY-wr.top-py)/sc-d.y;
-  e.preventDefault();
+  doff.x=(e.clientX-wr.left-px)/sc-d.x;doff.y=(e.clientY-wr.top-py)/sc-d.y;e.preventDefault();
 }
 document.addEventListener('mousemove',e=>{
   if(dragging){
     const d=ST.dances.find(x=>x.id===dragging);
-    if(d){
-      const wr=document.getElementById('cwrap').getBoundingClientRect();
-      d.x=Math.max(0,(e.clientX-wr.left-px)/sc-doff.x);
-      d.y=Math.max(0,(e.clientY-wr.top-py)/sc-doff.y);
-      render();
-    }
+    if(d){const wr=document.getElementById('cwrap').getBoundingClientRect();d.x=Math.max(0,(e.clientX-wr.left-px)/sc-doff.x);d.y=Math.max(0,(e.clientY-wr.top-py)/sc-doff.y);render();}
   }
   if(panning&&ps){px=e.clientX-ps.x;py=e.clientY-ps.y;applyT()}
 });
 document.addEventListener('mouseup',()=>{if(dragging)queueSync();dragging=null;panning=false});
-
 document.getElementById('cwrap').addEventListener('mousedown',e=>{
   if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
     panning=true;ps={x:e.clientX-px,y:e.clientY-py};e.preventDefault();
@@ -749,10 +618,8 @@ document.getElementById('cwrap').addEventListener('click',e=>{
 /* ═══ ZOOM ═══ */
 function applyT(){document.getElementById('canvas').style.transform=`translate(${px}px,${py}px) scale(${sc})`}
 function zoom(f){
-  const wrap=document.getElementById('cwrap');
-  const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;
-  px=cx-f*(cx-px);py=cy-f*(cy-py);
-  sc=Math.max(0.15,Math.min(3,sc*f));applyT();
+  const wrap=document.getElementById('cwrap');const cx=wrap.clientWidth/2,cy=wrap.clientHeight/2;
+  px=cx-f*(cx-px);py=cy-f*(cy-py);sc=Math.max(0.15,Math.min(3,sc*f));applyT();
 }
 function resetZoom(){sc=1;px=20;py=20;applyT()}
 document.getElementById('cwrap').addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:0.93)},{passive:false});
@@ -763,35 +630,29 @@ document.getElementById('cwrap').addEventListener('touchstart',e=>{
   if(e.touches.length===2){
     const t0=e.touches[0],t1=e.touches[1];
     lastPinchDist=Math.hypot(t0.clientX-t1.clientX,t0.clientY-t1.clientY);
-    pinchMidX=(t0.clientX+t1.clientX)/2;pinchMidY=(t0.clientY+t1.clientY)/2;
-    e.preventDefault();
+    pinchMidX=(t0.clientX+t1.clientX)/2;pinchMidY=(t0.clientY+t1.clientY)/2;e.preventDefault();
   }else if(e.touches.length===1){
     if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
       panning=true;ps={x:e.touches[0].clientX-px,y:e.touches[0].clientY-py};
     }
   }
 },{passive:false});
-
 document.getElementById('cwrap').addEventListener('touchmove',e=>{
   if(e.touches.length===2&&lastPinchDist!==null){
     const t0=e.touches[0],t1=e.touches[1];
-    const dist=Math.hypot(t0.clientX-t1.clientX,t0.clientY-t1.clientY);
-    const f=dist/lastPinchDist;
+    const dist=Math.hypot(t0.clientX-t1.clientX,t0.clientY-t1.clientY),f=dist/lastPinchDist;
     const wr=document.getElementById('cwrap').getBoundingClientRect();
     const cx=pinchMidX-wr.left,cy=pinchMidY-wr.top;
-    px=cx-f*(cx-px);py=cy-f*(cy-py);
-    sc=Math.max(0.15,Math.min(3,sc*f));
+    px=cx-f*(cx-px);py=cy-f*(cy-py);sc=Math.max(0.15,Math.min(3,sc*f));
     applyT();lastPinchDist=dist;e.preventDefault();
   }else if(e.touches.length===1&&panning&&ps){
     px=e.touches[0].clientX-ps.x;py=e.touches[0].clientY-ps.y;applyT();e.preventDefault();
   }
 },{passive:false});
-
 document.getElementById('cwrap').addEventListener('touchend',e=>{
   if(e.touches.length<2)lastPinchDist=null;
   if(e.touches.length===0){panning=false;ps=null;}
 },{passive:true});
-
 document.addEventListener('touchstart',e=>{
   if(!e.target.closest('.dance-node')&&!e.target.closest('.tw')&&!e.target.closest('.box-dd')&&!e.target.closest('.tw-dd')){
     document.querySelectorAll('.dance-node,.tw').forEach(n=>n.classList.remove('touched'));
@@ -801,14 +662,10 @@ document.addEventListener('touchstart',e=>{
 
 /* ═══ OVERVIEW ═══ */
 function toggleOv(){
-  const p=document.getElementById('ovp');
-  const opening=!p.classList.contains('open');
-  p.classList.toggle('open');
-  if(!opening)return;
-  const body=document.getElementById('ovb');
-  let td=0,tt=0;
-  ST.dances.forEach(d=>td+=parseDur(d.dur));
-  ST.transitions.forEach(t=>tt+=parseDur(t.dur));
+  const p=document.getElementById('ovp');const opening=!p.classList.contains('open');
+  p.classList.toggle('open');if(!opening)return;
+  const body=document.getElementById('ovb');let td=0,tt=0;
+  ST.dances.forEach(d=>td+=parseDur(d.dur));ST.transitions.forEach(t=>tt+=parseDur(t.dur));
   const dancers=allD(),props=allP();
   let h=`
     <div class="ov-sr">
@@ -839,10 +696,9 @@ function toggleOv(){
   body.innerHTML=h;
 }
 
-/* ═══ DATA ═══ */
+/* ═══ DATA MUTATIONS ═══ */
 function ud(id,f,v){const d=ST.dances.find(x=>x.id===id);if(d)d[f]=v;queueSync();render()}
 function ut(id,f,v){const t=ST.transitions.find(x=>x.id===id);if(t)t[f]=v;queueSync();render()}
-
 function rmDance(id){
   if(ST.dances.length<=1)return;
   ST.dances=ST.dances.filter(d=>d.id!==id);
@@ -854,111 +710,88 @@ function rmDance(id){
   }
   render();queueSync();
 }
-
 function addDance(){
   const newId='d'+nid++,tid='t'+nid++;
   const last=ST.dances[ST.dances.length-1];
   const nx=last?last.x:100,ny=last?last.y+BH+160:60;
   ST.dances.push({id:newId,title:'Dance '+(ST.dances.length+1),dur:'',dancers:'',props:'',notes:'',x:nx,y:ny});
   if(last)ST.transitions.push({id:tid,from:last.id,to:newId,name:'Transition',dur:'',dancers:'',props:'',notes:''});
-  sel=newId;render();
-  openEdit();
-  renderEdit(newId,'dance');
+  sel=newId;render();openEdit();renderEdit(newId,'dance');
   const wrap=document.getElementById('cwrap');
   setTimeout(()=>wrap.scrollTo({top:Math.max(0,ny*sc-wrap.clientHeight/2),behavior:'smooth'}),50);
 }
 
 /* ═══ EXPORT / IMPORT ═══ */
 function exportJSON(){
-  const blob = new Blob([JSON.stringify(ST, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'dancePlannerV4-backup.json';
-  a.click();
+  const blob=new Blob([JSON.stringify(ST,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='dancePlannerV4-backup.json';a.click();
 }
-
 function importJSON(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      let text = ev.target.result;
-      // strip RTF wrapper if needed
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if(!jsonMatch) throw new Error('No JSON found');
-      const parsed = JSON.parse(jsonMatch[0]);
-      if(!parsed.dances || !parsed.transitions) throw new Error('Invalid format');
-      if(!confirm('Replace current plan with imported data?')) return;
-      ST = parsed;
-      // recalculate nid so new additions don't collide
-      let maxId = 0;
-      [...ST.dances, ...ST.transitions].forEach(x => {
-        const n = parseInt((x.id||'').replace(/\D/g,''));
-        if(!isNaN(n) && n > maxId) maxId = n;
-      });
-      nid = maxId + 1;
-      sel = null;
-      queueSync();
-      render();
-      alert('Imported successfully: ' + ST.dances.length + ' dances, ' + ST.transitions.length + ' transitions.');
-    } catch(err) {
-      alert('Import failed: ' + err.message);
-    }
-    e.target.value = ''; // reset so same file can be re-imported
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      let text=ev.target.result;
+      const jsonMatch=text.match(/\{[\s\S]*\}/);if(!jsonMatch)throw new Error('No JSON found');
+      const parsed=JSON.parse(jsonMatch[0]);
+      if(!parsed.dances||!parsed.transitions)throw new Error('Invalid format');
+      if(!confirm('Replace current plan with imported data?'))return;
+      ST=parsed;
+      let maxId=0;
+      [...ST.dances,...ST.transitions].forEach(x=>{const n=parseInt((x.id||'').replace(/\D/g,''));if(!isNaN(n)&&n>maxId)maxId=n});
+      nid=maxId+1;sel=null;queueSync();render();
+      alert('Imported: '+ST.dances.length+' dances, '+ST.transitions.length+' transitions.');
+    }catch(err){alert('Import failed: '+err.message);}
+    e.target.value='';
   };
-  reader.readAsText(file, 'utf-8');
+  reader.readAsText(file,'utf-8');
 }
 
 /* ═══ REALTIME SYNC ═══ */
-function subscribeRealtime() {
-  sb.channel('dance_plan_updates')
-    .on(
-      'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'dance_plans', filter: `id=eq.${PROJECT_ID}` },
-      (payload) => {
-        // Only apply if this tab didn't just trigger the save
-        // (syncTimeout being set means WE just saved; skip our own echo)
-        if (syncTimeout) return;
-        if (payload.new?.data?.dances) {
-          ST = payload.new.data;
-          localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
+function subscribeRealtime(){
+  sb.channel('dance_plan_changes')
+    .on('postgres_changes',
+      {event:'UPDATE',schema:'public',table:'dance_plans',filter:`id=eq.${PROJECT_ID}`},
+      (payload)=>{
+        if(isSelfSave)return; // ignore our own echo
+        if(payload.new?.data?.dances){
+          ST=payload.new.data;
+          localStorage.setItem('dancePlannerV4',JSON.stringify(ST));
           render();
-          showSyncStatus('ok');
+          showPill('ok','☁ synced from another device');
         }
       }
-    )
-    .subscribe();
+    ).subscribe();
 }
-  
-/* ═══ INIT: load state then render ═══ */
+
+/* ═══ INIT ═══ */
 async function init(){
-  const local = localStorage.getItem('dancePlannerV4');
-  let localData = null;
-  if(local){ try { localData = JSON.parse(local); } catch(e){} }
-  if(localData) { ST = localData; render(); }
-  else render();
+  // 1. Show local data immediately (fast start)
+  const local=localStorage.getItem('dancePlannerV4');
+  if(local){try{ST=JSON.parse(local);}catch(e){}}
+  render();
 
-  try {
-    const { data, error } = await sb
-      .from('dance_plans')
-      .select('data')
-      .eq('id', PROJECT_ID)
-      .single();
-
-    if(!error && data?.data?.dances){
-      ST = data.data;
-      localStorage.setItem('dancePlannerV4', JSON.stringify(ST));
+  // 2. Fetch latest from cloud
+  showPill('saving','☁ loading…');
+  try{
+    const{data,error}=await sb.from('dance_plans').select('data').eq('id',PROJECT_ID).maybeSingle();
+    if(error)throw error;
+    if(data?.data?.dances){
+      ST=data.data;
+      localStorage.setItem('dancePlannerV4',JSON.stringify(ST));
       render();
-    } else if(!localData){
+      showPill('ok','☁ loaded');
+    } else {
+      // No row yet — push our default data up
       await syncToSupabase();
     }
-  } catch(e){
-    console.warn('Cloud unavailable, using local data:', e);
-    showSyncStatus('error');
+  }catch(e){
+    console.warn('Cloud load failed, using local:',e);
+    showPill('err','⚠ offline — using local data');
   }
 
-  // Subscribe AFTER initial load
+  // 3. Subscribe to realtime changes from other devices
   subscribeRealtime();
 }
 
